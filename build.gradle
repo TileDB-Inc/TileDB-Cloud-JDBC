@@ -1,0 +1,146 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.+'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.17.1'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'java-library'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id 'io.codearte.nexus-staging' version '0.30.0'
+    id 'signing'
+}
+
+group 'io.tiledb'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    mavenLocal()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation group: 'io.tiledb', name: 'openapi-java-client', version: '0.0.5'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = JavaVersion.VERSION_1_9
+targetCompatibility = JavaVersion.VERSION_1_9
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'openapi-java-client'
+            from components.java
+        }
+    }
+}
+
+task execute(type:JavaExec) {
+    main = System.getProperty('mainClass')
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+tasks.shadowJar.configure {
+    classifier = null
+}
+
+tasks.jar.configure {
+    classifier = 'default'
+}
+
+tasks.withType(Javadoc) {
+    failOnError false
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+
+sourceSets {
+    main.java.srcDirs = ['src/main/java']
+}
+
+task sourceJar(type: Jar) {
+    classifier "sources"
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier "javadoc"
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives shadowJar
+    archives sourceJar
+    archives javadocJar
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact shadowJar
+            artifact sourceJar
+            artifact javadocJar
+
+            pom {
+                name = 'TileDB Cloud JDBC'
+                description = 'The JDBC client for the TileDB Cloud Service'
+                url = 'https://github.com/TileDB-Inc/TileDB-Cloud-JDBC'
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = 'https://github.com/TileDB-Inc/TileDB-Cloud-JDBC/blob/master/LICENSE'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/TileDB-Inc/TileDB-Cloud-Java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/TileDB-Inc/TileDB-Cloud-Java'
+                    url = 'https://github.com/TileDB-Inc/TileDB-Cloud-Java'
+                }
+                developers {
+                    developer {
+                        name = 'TileDB, Inc'
+                        email = 'help@tiledb.io'
+                        organization = 'TileDB, Inc.'
+                        organizationUrl = 'https://tiledb.com/'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username System.getenv('SONATYPE_USERNAME')
+                password System.getenv('SONATYPE_PASSWORD')
+            }
+        }
+    }
+}
