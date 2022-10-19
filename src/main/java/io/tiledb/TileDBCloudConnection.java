@@ -2,16 +2,14 @@ package io.tiledb;
 
 
 
-import io.tiledb.cloud.rest_api.ApiClient;
+import io.tiledb.cloud.Login;
+import io.tiledb.cloud.TileDBClient;
 import io.tiledb.cloud.rest_api.ApiException;
-import io.tiledb.cloud.rest_api.Configuration;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
 import io.tiledb.cloud.rest_api.api.SqlApi;
-import io.tiledb.cloud.rest_api.auth.ApiKeyAuth;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.FileType;
 
-import java.nio.file.Path;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -22,19 +20,29 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	private String namespace;
 
+	/**
+	 *
+	 * @param namespace
+	 */
 	TileDBCloudConnection(String namespace) {
-		//todo change to use new login when update is out
-		ApiClient defaultClient = Configuration.getDefaultApiClient();
-		defaultClient.setBasePath("https://api.tiledb.com/v1");
+		TileDBClient tileDBClient = new TileDBClient();
 
-		Map<String, String> env = System.getenv();
+		arrayApi = new ArrayApi(tileDBClient.getApiClient());
+		sqlApi = new SqlApi(tileDBClient.getApiClient());
 
-		// Configure API key authorization: ApiKeyAuth
-		ApiKeyAuth ApiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("ApiKeyAuth");
-		ApiKeyAuth.setApiKey(env.get("TILEDB_REST_TOKEN"));
+		this.namespace = namespace;
+	}
 
-		arrayApi = new ArrayApi(defaultClient);
-		sqlApi = new SqlApi(defaultClient);
+	/**
+	 *
+	 * @param namespace
+	 * @param login
+	 */
+	TileDBCloudConnection(String namespace, Login login) {
+		TileDBClient tileDBClient = new TileDBClient(login);
+
+		arrayApi = new ArrayApi(tileDBClient.getApiClient());
+		sqlApi = new SqlApi(tileDBClient.getApiClient());
 
 		this.namespace = namespace;
 	}

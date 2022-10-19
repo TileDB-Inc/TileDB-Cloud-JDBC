@@ -1,5 +1,7 @@
 package io.tiledb;
 
+import io.tiledb.cloud.Login;
+
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Properties;
@@ -14,14 +16,40 @@ public class TileDBCloudDriver implements Driver {
 	@Override
 	public Connection connect(String s, Properties properties) throws SQLException {
 		String[] parts = s.split(":");
-		System.out.println(s);
 
-		if (parts.length < 2 ||	!parts[0].equalsIgnoreCase("jdbc") || !parts[1].equalsIgnoreCase("tiledb-cloud"))
+		//check for URL correctness
+		if (parts.length < 2 ||
+				!parts[0].equalsIgnoreCase("jdbc") ||
+				!parts[1].equalsIgnoreCase("tiledb-cloud"))
 			return null;
 
-		String namespace = Arrays.stream(parts).skip(2).collect(Collectors.joining(":"));
+		//get namespace from URL
+		String namespace = parts[2];
 
-		return new TileDBCloudConnection(namespace);
+		// call the appropriate connector depending on the properties given
+		if (properties.isEmpty()) return new TileDBCloudConnection(namespace);
+		return new TileDBCloudConnection(namespace, createLoginObject(properties));
+	}
+
+	/**
+	 * Create a TileDB login object based on the JDBC properties given as input.
+	 * @param properties The properties
+	 * @return The login object
+	 */
+	private Login createLoginObject(Properties properties) {
+		try {
+			return new Login(
+					(String) properties.getOrDefault("username", null),
+					(String) properties.getOrDefault("password", null),
+					"https://api.tiledb.com/v1",
+					(String) properties.getOrDefault("apiKey", null),
+					Boolean.parseBoolean((String) properties.getOrDefault("verifySSL", "true")),
+					Boolean.parseBoolean((String) properties.getOrDefault("rememberMe", "false")),
+					Boolean.parseBoolean((String) properties.getOrDefault("overwritePrevious", "false"))
+			);
+		} catch (Exception e){
+			throw new RuntimeException("Error with the input properties");
+		}
 	}
 
 	@Override
