@@ -1,10 +1,7 @@
 package io.tiledb;
 
-
-
 import io.tiledb.cloud.TileDBClient;
 import io.tiledb.cloud.TileDBSQL;
-import io.tiledb.cloud.rest_api.ApiException;
 import io.tiledb.cloud.rest_api.api.SqlApi;
 import io.tiledb.cloud.rest_api.model.ResultFormat;
 import io.tiledb.cloud.rest_api.model.SQLParameters;
@@ -12,13 +9,14 @@ import org.apache.arrow.vector.VectorSchemaRoot;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class TileDBCloudStatement implements Statement {
 	private SqlApi sqlApi;
 	private TileDBClient tileDBClient;
 
 	private String namespace;
+
+	private ArrayList<VectorSchemaRoot> readBatches;
 
 	TileDBCloudStatement(TileDBClient tileDBClient, String namespace) {
 		this.sqlApi = new SqlApi(tileDBClient.getApiClient());
@@ -40,8 +38,17 @@ public class TileDBCloudStatement implements Statement {
 		tileDBSQL.execArrow();
 
 		//get results and create a resultSet
-		ArrayList<VectorSchemaRoot> readBatches = tileDBSQL.getReadBatches();
+		readBatches = tileDBSQL.getReadBatches();
 		return new TileDBCloudResultSet(readBatches, ResultFormat.ARROW);
+	}
+
+	/**
+	 * Return the results in arrow format instead of the traditional ResultSet.
+	 * The results are in the form of an ArrayList with all the read batches.
+	 * @return
+	 */
+	public ArrayList<VectorSchemaRoot> getReadBatches() {
+		return readBatches;
 	}
 
 	@Override
