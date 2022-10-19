@@ -1,13 +1,12 @@
 package io.tiledb;
 
-import org.openapitools.client.ApiException;
-import org.openapitools.client.api.SqlApi;
-import org.openapitools.client.model.ResultFormat;
-import org.openapitools.client.model.SQLParameters;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
+import io.tiledb.cloud.rest_api.ApiException;
+import io.tiledb.cloud.rest_api.api.SqlApi;
+import io.tiledb.cloud.rest_api.model.ResultFormat;
+import io.tiledb.cloud.rest_api.model.SQLParameters;
+
 import java.sql.*;
 import java.util.List;
 

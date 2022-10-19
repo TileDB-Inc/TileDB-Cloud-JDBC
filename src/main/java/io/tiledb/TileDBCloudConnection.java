@@ -1,14 +1,15 @@
 package io.tiledb;
 
-import org.openapitools.client.ApiClient;
-import org.openapitools.client.ApiException;
-import org.openapitools.client.Configuration;
-import org.openapitools.client.api.ArrayApi;
-import org.openapitools.client.auth.ApiKeyAuth;
-import org.openapitools.client.model.ArrayBrowserData;
-import org.openapitools.client.model.ArrayInfo;
-import org.openapitools.client.api.SqlApi;
-import org.openapitools.client.model.FileType;
+
+
+import io.tiledb.cloud.rest_api.ApiClient;
+import io.tiledb.cloud.rest_api.ApiException;
+import io.tiledb.cloud.rest_api.Configuration;
+import io.tiledb.cloud.rest_api.api.ArrayApi;
+import io.tiledb.cloud.rest_api.api.SqlApi;
+import io.tiledb.cloud.rest_api.auth.ApiKeyAuth;
+import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
+import io.tiledb.cloud.rest_api.model.FileType;
 
 import java.nio.file.Path;
 import java.sql.*;

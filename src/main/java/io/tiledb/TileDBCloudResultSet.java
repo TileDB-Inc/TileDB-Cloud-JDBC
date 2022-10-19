@@ -1,7 +1,8 @@
 package io.tiledb;
 
 import com.google.gson.internal.LinkedTreeMap;
-import org.openapitools.client.model.ResultFormat;
+import io.tiledb.cloud.rest_api.model.ResultFormat;
+
 
 import java.io.InputStream;
 import java.io.Reader;
