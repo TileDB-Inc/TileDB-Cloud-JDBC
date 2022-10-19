@@ -17,7 +17,7 @@ import java.util.concurrent.Executor;
 public class TileDBCloudConnection implements java.sql.Connection {
 	private ArrayApi arrayApi;
 	private SqlApi sqlApi;
-
+	private TileDBClient tileDBClient;
 	private String namespace;
 
 	/**
@@ -25,11 +25,8 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	 * @param namespace
 	 */
 	TileDBCloudConnection(String namespace) {
-		TileDBClient tileDBClient = new TileDBClient();
-
-		arrayApi = new ArrayApi(tileDBClient.getApiClient());
-		sqlApi = new SqlApi(tileDBClient.getApiClient());
-
+		this.tileDBClient = new TileDBClient();
+		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
 		this.namespace = namespace;
 	}
 
@@ -39,17 +36,14 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	 * @param login
 	 */
 	TileDBCloudConnection(String namespace, Login login) {
-		TileDBClient tileDBClient = new TileDBClient(login);
-
-		arrayApi = new ArrayApi(tileDBClient.getApiClient());
-		sqlApi = new SqlApi(tileDBClient.getApiClient());
-
+		this.tileDBClient = new TileDBClient(login);
+		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
 		this.namespace = namespace;
 	}
 
 	@Override
 	public Statement createStatement() throws SQLException {
-		return new TileDBCloudStatement(sqlApi, namespace);
+		return new TileDBCloudStatement(tileDBClient, namespace);
 	}
 
 	@Override

@@ -2,36 +2,46 @@ package io.tiledb;
 
 
 
+import io.tiledb.cloud.TileDBClient;
+import io.tiledb.cloud.TileDBSQL;
 import io.tiledb.cloud.rest_api.ApiException;
 import io.tiledb.cloud.rest_api.api.SqlApi;
 import io.tiledb.cloud.rest_api.model.ResultFormat;
 import io.tiledb.cloud.rest_api.model.SQLParameters;
+import org.apache.arrow.vector.VectorSchemaRoot;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TileDBCloudStatement implements Statement {
 	private SqlApi sqlApi;
+	private TileDBClient tileDBClient;
 
 	private String namespace;
 
-	TileDBCloudStatement(SqlApi sqlApi, String namespace) {
-		this.sqlApi = sqlApi;
+	TileDBCloudStatement(TileDBClient tileDBClient, String namespace) {
+		this.sqlApi = new SqlApi(tileDBClient.getApiClient());
 		this.namespace = namespace;
+		this.tileDBClient = tileDBClient;
 	}
 
 	@Override
 	public ResultSet executeQuery(String s) throws SQLException {
-		try {
-			SQLParameters sqlParameters = new SQLParameters();
-			sqlParameters.setQuery(s);
-//			sqlParameters.setParameters();
-			sqlParameters.setResultFormat(ResultFormat.JSON);
-			List<Object> results = sqlApi.runSQL(namespace, sqlParameters, "application/json");
-			return new TileDBCloudResultSet(results, ResultFormat.JSON);
-		} catch (ApiException e) {
-			throw new SQLException(e);
-		}
+		// create SQL parameters
+		SQLParameters sqlParameters = new SQLParameters();
+		sqlParameters.setQuery(s);
+		sqlParameters.setResultFormat(ResultFormat.ARROW);
+
+		//create TileDBSQL object
+		TileDBSQL tileDBSQL = new TileDBSQL(tileDBClient, namespace, sqlParameters);
+
+		//run query and expect results in arrow format
+		tileDBSQL.execArrow();
+
+		//get results and create a resultSet
+		ArrayList<VectorSchemaRoot> readBatches = tileDBSQL.getReadBatches();
+		return new TileDBCloudResultSet(readBatches, ResultFormat.ARROW);
 	}
 
 	@Override

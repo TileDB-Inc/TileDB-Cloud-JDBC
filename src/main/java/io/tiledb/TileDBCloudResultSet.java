@@ -2,6 +2,7 @@ package io.tiledb;
 
 import com.google.gson.internal.LinkedTreeMap;
 import io.tiledb.cloud.rest_api.model.ResultFormat;
+import org.apache.arrow.vector.VectorSchemaRoot;
 
 
 import java.io.InputStream;
@@ -18,16 +19,12 @@ public class TileDBCloudResultSet implements ResultSet {
 	private List<LinkedTreeMap> results;
 	private LinkedTreeMap record = null;
 
-	public TileDBCloudResultSet(List<Object> result, ResultFormat resultFormat) {
-
-		if (resultFormat == ResultFormat.JSON) {
-//			System.out.println(((com.google.gson.internal.LinkedTreeMap) results.get(0)).get("a"));
-//			System.out.println(results.get(0));
+	public TileDBCloudResultSet(ArrayList<VectorSchemaRoot> result, ResultFormat resultFormat) {
+		//todo handle arrow results
+		if (resultFormat == ResultFormat.ARROW) {
 			this.results = (List<LinkedTreeMap>) (Object) result;
 			iterator = this.results.iterator();
 		}
-//		throw new SQLException("Unsupported result format: " + resultFormat.toString());
-//		iterator = s.iterator();
 	}
 	@Override
 	public boolean next() throws SQLException {
