@@ -1,12 +1,10 @@
 package io.tiledb;
 
-import com.google.gson.internal.LinkedTreeMap;
-import io.tiledb.cloud.rest_api.model.ResultFormat;
-import org.apache.arrow.vector.VectorSchemaRoot;
+import io.tiledb.java.api.Pair;
+import org.apache.arrow.vector.ValueVector;
+import org.apache.arrow.vector.util.Text;
 
-
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
@@ -14,29 +12,47 @@ import java.sql.Date;
 import java.util.*;
 
 public class TileDBCloudResultSet implements ResultSet {
-	private static final String FIELD_SEPARATOR = ";";
-	private Iterator<LinkedTreeMap> iterator;
-	private List<LinkedTreeMap> results;
-	private LinkedTreeMap record = null;
 
-	public TileDBCloudResultSet(ArrayList<VectorSchemaRoot> result, ResultFormat resultFormat) {
-		//todo handle arrow results
-		if (resultFormat == ResultFormat.ARROW) {
-			this.results = (List<LinkedTreeMap>) (Object) result;
-			iterator = this.results.iterator();
+	private int readBatchCount;
+	private ArrayList<ValueVector> valueVectors;
+	private int currentRow;
+	private int currentBatch;
+
+	private int fieldsPerBatch;
+
+	private Map<String, Integer> columnToPosition;
+
+	public TileDBCloudResultSet(Pair<ArrayList<ValueVector>, Integer> resultsArrow) {
+		this.readBatchCount = resultsArrow.getSecond();
+		this.valueVectors = resultsArrow.getFirst();
+		this.currentRow = -1;
+		this.currentBatch = 0;
+		this.fieldsPerBatch = this.valueVectors.size() / readBatchCount;
+		this.columnToPosition = new HashMap<>();
+
+		buildColumnsToPosition();
+	}
+
+	/**
+	 * Build hashMap with index and column names
+	 */
+	private void buildColumnsToPosition() {
+		columnToPosition.clear();
+
+		for (int i = 0; i < this.fieldsPerBatch; i++) {
+			columnToPosition.put(valueVectors.get(i).getName(), i);
 		}
 	}
+
 	@Override
 	public boolean next() throws SQLException {
-		boolean retVal = iterator.hasNext();
-		record = null;
-
-		if (iterator.hasNext()) {
-			record = iterator.next();
-			System.out.println(record);
+		if (valueVectors.get(currentBatch).getValueCount() - 1 > currentRow){
+			currentRow++;
+		} else{
+			currentBatch++;
+			currentRow = 0;
 		}
-
-		return retVal;
+		return currentBatch < readBatchCount;
 	}
 
 	@Override
@@ -51,53 +67,62 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public String getString(int i) throws SQLException {
-//		return "";
-		return record.entrySet().toArray()[i].toString();
+		Text text = (Text)valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
+		return text.toString();
 	}
 
 	@Override
 	public boolean getBoolean(int i) throws SQLException {
-		return false;
+		int flag = (int) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
+		return flag == 1;
 	}
 
 	@Override
 	public byte getByte(int i) throws SQLException {
-		return 0;
+		return (byte) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public short getShort(int i) throws SQLException {
-		return 0;
+		return (short) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public int getInt(int i) throws SQLException {
-		return 0;
+		return (int) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public long getLong(int i) throws SQLException {
-		return 0;
+		return (long) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public float getFloat(int i) throws SQLException {
-		return 0;
+		return (float) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public double getDouble(int i) throws SQLException {
-		return 0;
+		return (double) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(int i, int i1) throws SQLException {
-		return null;
+		return (BigDecimal) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public byte[] getBytes(int i) throws SQLException {
-		return new byte[0];
+		Object obj = valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
+		ByteArrayOutputStream boas = new ByteArrayOutputStream();
+		try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
+			ois.writeObject(obj);
+			return boas.toByteArray();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		throw new RuntimeException();
 	}
 
 	@Override
@@ -132,42 +157,42 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public String getString(String s) throws SQLException {
-		return null;
+		return this.getString(findColumn(s));
 	}
 
 	@Override
 	public boolean getBoolean(String s) throws SQLException {
-		return false;
+		return this.getBoolean(findColumn(s));
 	}
 
 	@Override
 	public byte getByte(String s) throws SQLException {
-		return 0;
+		return this.getByte(findColumn(s));
 	}
 
 	@Override
 	public short getShort(String s) throws SQLException {
-		return 0;
+		return this.getShort(findColumn(s));
 	}
 
 	@Override
 	public int getInt(String s) throws SQLException {
-		return 0;
+		return this.getInt(findColumn(s));
 	}
 
 	@Override
 	public long getLong(String s) throws SQLException {
-		return 0;
+		return this.getLong(findColumn(s));
 	}
 
 	@Override
 	public float getFloat(String s) throws SQLException {
-		return 0;
+		return this.getFloat(findColumn(s));
 	}
 
 	@Override
 	public double getDouble(String s) throws SQLException {
-		return 0;
+		return this.getDouble(findColumn(s));
 	}
 
 	@Override
@@ -177,7 +202,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public byte[] getBytes(String s) throws SQLException {
-		return new byte[0];
+		return this.getBytes(findColumn(s));
 	}
 
 	@Override
@@ -227,22 +252,23 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
+		//todo
 		return null;
 	}
 
 	@Override
 	public Object getObject(int i) throws SQLException {
-		return null;
+		return valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public Object getObject(String s) throws SQLException {
-		return null;
+		return this.getInt(findColumn(s));
 	}
 
 	@Override
 	public int findColumn(String s) throws SQLException {
-		return 0;
+		return this.columnToPosition.get(s);
 	}
 
 	@Override
@@ -257,57 +283,60 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public BigDecimal getBigDecimal(int i) throws SQLException {
-		return null;
+		return (BigDecimal) valueVectors.get(i + (currentBatch * fieldsPerBatch)).getObject(currentRow);
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String s) throws SQLException {
-		return null;
+		return this.getBigDecimal(findColumn(s));
 	}
 
 	@Override
 	public boolean isBeforeFirst() throws SQLException {
-		return false;
+		return currentRow == -1;
 	}
 
 	@Override
 	public boolean isAfterLast() throws SQLException {
-		return false;
+		return false; //todo
 	}
 
 	@Override
 	public boolean isFirst() throws SQLException {
-		return false;
+		return currentRow == 0 && currentBatch == 0;
 	}
 
 	@Override
 	public boolean isLast() throws SQLException {
-		return false;
+		return false; //todo
 	}
 
 	@Override
 	public void beforeFirst() throws SQLException {
-
+		this.currentRow = -1;
+		this.currentBatch = 0;
 	}
 
 	@Override
 	public void afterLast() throws SQLException {
-
+		//todo
 	}
 
 	@Override
 	public boolean first() throws SQLException {
-		return false;
+		this.currentRow = -1;
+		this.currentBatch = 0;
+		return valueVectors.get(0).getValueCount() > 0;
 	}
 
 	@Override
 	public boolean last() throws SQLException {
-		return false;
+		return false; //todo
 	}
 
 	@Override
 	public int getRow() throws SQLException {
-		return 0;
+		return 0; //todo
 	}
 
 	@Override

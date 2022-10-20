@@ -1,12 +1,9 @@
 package io.tiledb;
 
-
-
-import io.tiledb.cloud.Login;
 import io.tiledb.cloud.TileDBClient;
+import io.tiledb.cloud.TileDBLogin;
 import io.tiledb.cloud.rest_api.ApiException;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
-import io.tiledb.cloud.rest_api.api.SqlApi;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.FileType;
 
@@ -16,7 +13,6 @@ import java.util.concurrent.Executor;
 
 public class TileDBCloudConnection implements java.sql.Connection {
 	private ArrayApi arrayApi;
-	private SqlApi sqlApi;
 	private TileDBClient tileDBClient;
 	private String namespace;
 
@@ -27,6 +23,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	TileDBCloudConnection(String namespace) {
 		this.tileDBClient = new TileDBClient();
 		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
+		this.tileDBClient.getApiClient().setReadTimeout(0);
 		this.namespace = namespace;
 	}
 
@@ -35,7 +32,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	 * @param namespace
 	 * @param login
 	 */
-	TileDBCloudConnection(String namespace, Login login) {
+	TileDBCloudConnection(String namespace, TileDBLogin login) {
 		this.tileDBClient = new TileDBClient(login);
 		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
 		this.namespace = namespace;

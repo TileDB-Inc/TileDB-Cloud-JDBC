@@ -5,6 +5,8 @@ import io.tiledb.cloud.TileDBSQL;
 import io.tiledb.cloud.rest_api.api.SqlApi;
 import io.tiledb.cloud.rest_api.model.ResultFormat;
 import io.tiledb.cloud.rest_api.model.SQLParameters;
+import io.tiledb.java.api.Pair;
+import org.apache.arrow.vector.ValueVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
 
 import java.sql.*;
@@ -22,6 +24,7 @@ public class TileDBCloudStatement implements Statement {
 		this.sqlApi = new SqlApi(tileDBClient.getApiClient());
 		this.namespace = namespace;
 		this.tileDBClient = tileDBClient;
+		this.readBatches = new ArrayList<>();
 	}
 
 	@Override
@@ -35,11 +38,9 @@ public class TileDBCloudStatement implements Statement {
 		TileDBSQL tileDBSQL = new TileDBSQL(tileDBClient, namespace, sqlParameters);
 
 		//run query and expect results in arrow format
-		tileDBSQL.execArrow();
+		Pair<ArrayList<ValueVector>, Integer> valueVectors = tileDBSQL.execArrow();
 
-		//get results and create a resultSet
-		readBatches = tileDBSQL.getReadBatches();
-		return new TileDBCloudResultSet(readBatches, ResultFormat.ARROW);
+		return new TileDBCloudResultSet(valueVectors);
 	}
 
 	/**

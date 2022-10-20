@@ -34,7 +34,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.0.6'
+    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.0.7-SNAPSHOT'
 }
 
 test {
@@ -44,8 +44,8 @@ test {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-sourceCompatibility = JavaVersion.VERSION_1_9
-targetCompatibility = JavaVersion.VERSION_1_9
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 publishing {
     publications {

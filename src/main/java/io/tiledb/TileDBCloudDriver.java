@@ -1,6 +1,6 @@
 package io.tiledb;
 
-import io.tiledb.cloud.Login;
+import io.tiledb.cloud.TileDBLogin;
 
 import java.sql.*;
 import java.util.Arrays;
@@ -36,12 +36,11 @@ public class TileDBCloudDriver implements Driver {
 	 * @param properties The properties
 	 * @return The login object
 	 */
-	private Login createLoginObject(Properties properties) {
+	private TileDBLogin createLoginObject(Properties properties) {
 		try {
-			return new Login(
+			return new TileDBLogin(
 					(String) properties.getOrDefault("username", null),
 					(String) properties.getOrDefault("password", null),
-					"https://api.tiledb.com/v1",
 					(String) properties.getOrDefault("apiKey", null),
 					Boolean.parseBoolean((String) properties.getOrDefault("verifySSL", "true")),
 					Boolean.parseBoolean((String) properties.getOrDefault("rememberMe", "false")),
