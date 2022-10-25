@@ -23,7 +23,6 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	TileDBCloudConnection(String namespace) {
 		this.tileDBClient = new TileDBClient();
 		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
-		this.tileDBClient.getApiClient().setReadTimeout(0);
 		this.namespace = namespace;
 	}
 
