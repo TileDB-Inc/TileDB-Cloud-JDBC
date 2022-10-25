@@ -17,8 +17,9 @@ public class TileDBCloudResultSet implements ResultSet {
 	private ArrayList<ValueVector> valueVectors;
 	private int currentRow;
 	private int currentBatch;
-
 	private int fieldsPerBatch;
+
+	private int globalRowCount;
 
 	private Map<String, Integer> columnToPosition;
 
@@ -27,6 +28,7 @@ public class TileDBCloudResultSet implements ResultSet {
 		this.valueVectors = resultsArrow.getFirst();
 		this.currentRow = -1;
 		this.currentBatch = 0;
+		this.globalRowCount = 0;
 		this.fieldsPerBatch = this.valueVectors.size() / readBatchCount;
 		this.columnToPosition = new HashMap<>();
 
@@ -48,6 +50,7 @@ public class TileDBCloudResultSet implements ResultSet {
 	public boolean next() throws SQLException {
 		if (valueVectors.get(currentBatch).getValueCount() - 1 > currentRow){
 			currentRow++;
+			globalRowCount++;
 		} else{
 			currentBatch++;
 			currentRow = 0;
@@ -298,7 +301,8 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public boolean isAfterLast() throws SQLException {
-		return false; //todo
+		return (currentBatch == readBatchCount -1) &&
+				currentRow > valueVectors.get(currentBatch * fieldsPerBatch).getValueCount() - 1;
 	}
 
 	@Override
@@ -308,7 +312,8 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public boolean isLast() throws SQLException {
-		return false; //todo
+		return (currentBatch == readBatchCount -1) &&
+				currentRow == valueVectors.get(currentBatch * fieldsPerBatch).getValueCount() - 1;
 	}
 
 	@Override
@@ -319,7 +324,8 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public void afterLast() throws SQLException {
-		//todo
+		currentBatch = readBatchCount -1;
+		currentRow = valueVectors.get(currentBatch * fieldsPerBatch).getValueCount();
 	}
 
 	@Override
@@ -331,12 +337,14 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public boolean last() throws SQLException {
-		return false; //todo
+		currentBatch = readBatchCount -1;
+		currentRow = valueVectors.get(currentBatch * fieldsPerBatch).getValueCount() - 1;
+		return valueVectors.get(0).getValueCount() > 0;
 	}
 
 	@Override
 	public int getRow() throws SQLException {
-		return 0; //todo
+		return globalRowCount;
 	}
 
 	@Override
