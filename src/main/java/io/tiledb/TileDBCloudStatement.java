@@ -18,6 +18,8 @@ public class TileDBCloudStatement implements Statement {
 
 	private String namespace;
 
+	private ResultSet resultSet;
+
 	private ArrayList<VectorSchemaRoot> readBatches;
 
 	TileDBCloudStatement(TileDBClient tileDBClient, String namespace) {
@@ -40,16 +42,7 @@ public class TileDBCloudStatement implements Statement {
 		//run query and expect results in arrow format
 		Pair<ArrayList<ValueVector>, Integer> valueVectors = tileDBSQL.execArrow();
 
-		return new TileDBCloudResultSet(valueVectors);
-	}
-
-	/**
-	 * Return the results in arrow format instead of the traditional ResultSet.
-	 * The results are in the form of an ArrayList with all the read batches.
-	 * @return
-	 */
-	public ArrayList<VectorSchemaRoot> getReadBatches() {
-		return readBatches;
+		return new TileDBCloudResultSet(valueVectors, namespace);
 	}
 
 	@Override
@@ -119,12 +112,13 @@ public class TileDBCloudStatement implements Statement {
 
 	@Override
 	public boolean execute(String s) throws SQLException {
-		return false;
+		this.resultSet = this.executeQuery(s);
+		return true;
 	}
 
 	@Override
 	public ResultSet getResultSet() throws SQLException {
-		return null;
+		return this.resultSet;
 	}
 
 	@Override
