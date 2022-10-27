@@ -15,12 +15,12 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public boolean allTablesAreSelectable() throws SQLException {
-        return false;
+        return true;
     }
 
     @Override
     public String getURL() throws SQLException {
-        return null;
+        return "jdbc:tiledb-cloud:dstara";
     }
 
     @Override
@@ -65,12 +65,12 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public String getDriverName() throws SQLException {
-        return null;
+        return "TileDB-Driver";
     }
 
     @Override
     public String getDriverVersion() throws SQLException {
-        return null;
+        return "0.0.1";
     }
 
     @Override
