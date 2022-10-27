@@ -2,7 +2,10 @@ package io.tiledb;
 
 import io.tiledb.cloud.TileDBClient;
 import io.tiledb.cloud.TileDBLogin;
+import io.tiledb.cloud.rest_api.ApiException;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
+import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
+import io.tiledb.cloud.rest_api.model.FileType;
 
 import java.sql.*;
 import java.util.*;
@@ -86,23 +89,20 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
-//
-//		// List arrays owned
-//		try {
-//			List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
-//			ArrayBrowserData result = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
-//			System.out.println(result); //todo handle metadata
-//
-////			DatabaseMetaData databaseMetaData;
-////			databaseMetaData.getTables();
-//		} catch (ApiException e) {
-//			System.err.println("Exception when calling ArrayApi#getArraysInNamespace");
-//			System.err.println("Status code: " + e.getCode());
-//			System.err.println("Reason: " + e.getResponseBody());
-//			System.err.println("Response headers: " + e.getResponseHeaders());
-//			e.printStackTrace();
-//		}
-//
+		TileDBCloudConnectionMetadata tileDBCloudConnectionMetadata = new TileDBCloudConnectionMetadata();
+		// List arrays owned
+		try {
+			List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
+			ArrayBrowserData result = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
+			tileDBCloudConnectionMetadata.setArrays(result);
+			return tileDBCloudConnectionMetadata;
+		} catch (ApiException e) {
+			System.err.println("Exception when calling ArrayApi#getArraysInNamespace");
+			System.err.println("Status code: " + e.getCode());
+			System.err.println("Reason: " + e.getResponseBody());
+			System.err.println("Response headers: " + e.getResponseHeaders());
+			e.printStackTrace();
+		}
 		return null;
 	}
 

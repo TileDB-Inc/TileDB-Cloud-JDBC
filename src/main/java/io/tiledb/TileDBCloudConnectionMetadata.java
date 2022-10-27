@@ -1,8 +1,12 @@
 package io.tiledb;
 
+import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
+
 import java.sql.*;
 
-public class DatabaseMetadata implements DatabaseMetaData {
+public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
+
+    private ArrayBrowserData arrays;
 
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
@@ -606,7 +610,7 @@ public class DatabaseMetadata implements DatabaseMetaData {
 
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
-        return null;
+        return new TileDBCloudConnectionMetadataResultSet(this.arrays);
     }
 
     @Override
@@ -882,5 +886,9 @@ public class DatabaseMetadata implements DatabaseMetaData {
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
+    }
+
+    public void setArrays(ArrayBrowserData result) {
+        this.arrays = result;
     }
 }
