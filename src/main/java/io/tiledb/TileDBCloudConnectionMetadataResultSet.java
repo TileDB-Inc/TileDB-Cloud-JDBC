@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TileDBCloudConnectionMetadataResultSet implements ResultSet {
-    private final Iterator<ArrayInfo> iterator;
+    private Iterator<ArrayInfo> iterator = null;
     private List<ArrayInfo> arrays;
     private ArrayInfo currentArray;
     public TileDBCloudConnectionMetadataResultSet(ArrayBrowserData arrays) {
@@ -22,8 +22,13 @@ public class TileDBCloudConnectionMetadataResultSet implements ResultSet {
         this.iterator = this.arrays.iterator();
     }
 
+    public TileDBCloudConnectionMetadataResultSet(){
+
+    }
+
     @Override
     public boolean next() throws SQLException {
+        if (iterator == null) return false;
         boolean retVal = iterator.hasNext();
         currentArray = null;
 
@@ -222,12 +227,12 @@ public class TileDBCloudConnectionMetadataResultSet implements ResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return new TileDBCloudResultSetMetadata();
     }
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return currentArray.getName();
+        return  currentArray.getName();
     }
 
     @Override

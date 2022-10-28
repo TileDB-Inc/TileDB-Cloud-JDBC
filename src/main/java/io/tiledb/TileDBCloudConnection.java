@@ -91,19 +91,19 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	public DatabaseMetaData getMetaData() throws SQLException {
 		TileDBCloudConnectionMetadata tileDBCloudConnectionMetadata = new TileDBCloudConnectionMetadata();
 		// List arrays owned
-//		try {
-//			List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
-//			ArrayBrowserData result = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
-//			tileDBCloudConnectionMetadata.setArrays(result);
+		try {
+			List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
+			ArrayBrowserData result = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
+			tileDBCloudConnectionMetadata.setArrays(result);
 			return tileDBCloudConnectionMetadata;
-//		} catch (ApiException e) {
-//			System.err.println("Exception when calling ArrayApi#getArraysInNamespace");
-//			System.err.println("Status code: " + e.getCode());
-//			System.err.println("Reason: " + e.getResponseBody());
-//			System.err.println("Response headers: " + e.getResponseHeaders());
-//			e.printStackTrace();
-//		}
-//		return null;
+		} catch (ApiException e) {
+			System.err.println("Exception when calling ArrayApi#getArraysInNamespace");
+			System.err.println("Status code: " + e.getCode());
+			System.err.println("Reason: " + e.getResponseBody());
+			System.err.println("Response headers: " + e.getResponseHeaders());
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override

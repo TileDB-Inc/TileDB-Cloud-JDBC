@@ -15,13 +15,9 @@ public class TileDBCloudDriver implements Driver {
 
 	@Override
 	public Connection connect(String s, Properties properties) throws SQLException {
-		String[] parts = s.split(":");
+		if (!acceptsURL(s)) return null;
 
-		//check for URL correctness
-		if (parts.length < 2 ||
-				!parts[0].equalsIgnoreCase("jdbc") ||
-				!parts[1].equalsIgnoreCase("tiledb-cloud"))
-			return null;
+		String[] parts = s.split(":");
 
 		//get namespace from URL
 		String namespace = parts[2];
@@ -53,7 +49,12 @@ public class TileDBCloudDriver implements Driver {
 
 	@Override
 	public boolean acceptsURL(String s) throws SQLException {
-		return true;
+		//check for URL correctness
+		String[] parts = s.split(":");
+
+		return parts.length >= 2 &&
+				parts[0].equalsIgnoreCase("jdbc") &&
+				parts[1].equalsIgnoreCase("tiledb-cloud");
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class TileDBCloudDriver implements Driver {
 
 	@Override
 	public boolean jdbcCompliant() {
-		return false;
+		return true;
 	}
 
 	@Override
