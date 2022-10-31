@@ -8,26 +8,50 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.sql.Date;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class TileDBCloudConnectionMetadataResultSet implements ResultSet {
+public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
     private Iterator<ArrayInfo> iterator = null;
+    private List<ArrayInfo> arraysOwned;
+    private List<ArrayInfo> arraysShared;
     private List<ArrayInfo> arrays;
+    private int arrayIndex;
+
     private ArrayInfo currentArray;
-    public TileDBCloudConnectionMetadataResultSet(ArrayBrowserData arrays) {
-        this.arrays = arrays.getArrays();
+
+    private Logger logger = Logger.getLogger(TileDBCloudDatabaseMetadataResultSet.class.getName());
+
+    public TileDBCloudDatabaseMetadataResultSet(ArrayBrowserData arraysOwnedData, ArrayBrowserData arraysSharedData) {
+        this.arrays = new ArrayList<ArrayInfo>();
+
+        if (arraysOwnedData == null) this.arraysOwned = new ArrayList<ArrayInfo>();
+        else {
+            this.arraysOwned = arraysOwnedData.getArrays();
+        }
+
+        if (arraysSharedData == null) this.arraysShared = new ArrayList<ArrayInfo>();
+        else {
+            this.arraysShared = arraysSharedData.getArrays();
+        }
+
+        this.arrays.addAll(arraysOwned);
+        this.arrays.addAll(arraysShared);
+
         this.iterator = this.arrays.iterator();
+
+        this.arrayIndex = -1;
     }
 
-    public TileDBCloudConnectionMetadataResultSet(){
+    public TileDBCloudDatabaseMetadataResultSet(){
 
     }
 
     @Override
     public boolean next() throws SQLException {
+        arrayIndex++;
         if (iterator == null) return false;
         boolean retVal = iterator.hasNext();
         currentArray = null;
@@ -52,7 +76,7 @@ public class TileDBCloudConnectionMetadataResultSet implements ResultSet {
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return currentArray.getName();
+        return "";
     }
 
     @Override
@@ -132,7 +156,18 @@ public class TileDBCloudConnectionMetadataResultSet implements ResultSet {
 
     @Override
     public String getString(String columnLabel) throws SQLException {
-        return null;
+        String ownership = "Owned";
+        if (arrayIndex > this.arraysOwned.size() - 1) ownership = "Shared";
+
+        switch (columnLabel) {
+            case "TABLE_NAME":
+                return this.currentArray.getName();
+            case "REMARKS":
+                return ownership;
+            case "TABLE_TYPE":
+                return "TABLE";
+        }
+        return "";
     }
 
     @Override

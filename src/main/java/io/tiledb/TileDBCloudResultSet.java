@@ -17,7 +17,7 @@ public class TileDBCloudResultSet implements ResultSet {
 	private ArrayList<ValueVector> valueVectors;
 	private int currentRow;
 	private int currentBatch;
-	private int fieldsPerBatch;
+	private int fieldsPerBatch = 0;
 	private int globalRowCount;
 	private String namespace;
 	private Map<String, Integer> columnToPosition;
@@ -29,7 +29,7 @@ public class TileDBCloudResultSet implements ResultSet {
 		this.currentBatch = 0;
 		this.globalRowCount = 1;
 		this.namespace = namespace;
-		this.fieldsPerBatch = this.valueVectors.size() / readBatchCount;
+		if (readBatchCount != 0) this.fieldsPerBatch = this.valueVectors.size() / readBatchCount;
 		this.columnToPosition = new HashMap<>();
 
 		buildColumnsToPosition();

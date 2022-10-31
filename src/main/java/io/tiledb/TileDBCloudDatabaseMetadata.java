@@ -4,9 +4,11 @@ import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 
 import java.sql.*;
 
-public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
+public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
-    private ArrayBrowserData arrays;
+    private ArrayBrowserData arraysOwned;
+    private ArrayBrowserData arraysShared;
+    private String namespace;
 
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
@@ -20,7 +22,7 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public String getURL() throws SQLException {
-        return "jdbc:tiledb-cloud:namespace";
+        return "jdbc:tiledb-cloud:" + namespace;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public String getDatabaseProductName() throws SQLException {
-        return "TileDB-JDBC-Driver";
+        return "TileDB-Cloud JDBC Driver";
     }
 
     @Override
@@ -600,87 +602,87 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern, String columnNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet(this.arrays);
+        return new TileDBCloudDatabaseMetadataResultSet(this.arraysOwned, this.arraysShared);
     }
 
     @Override
     public ResultSet getSchemas() throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getCatalogs() throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getTableTypes() throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getVersionColumns(String catalog, String schema, String table) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getImportedKeys(String catalog, String schema, String table) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getExportedKeys(String catalog, String schema, String table) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable, String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getTypeInfo() throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
@@ -745,7 +747,7 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
@@ -775,17 +777,17 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
@@ -840,7 +842,7 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
@@ -855,22 +857,22 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
 
     @Override
     public ResultSet getClientInfoProperties() throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
     public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
-        return new TileDBCloudConnectionMetadataResultSet();
+        return new TileDBCloudDatabaseMetadataResultSet();
     }
 
     @Override
@@ -888,7 +890,15 @@ public class TileDBCloudConnectionMetadata implements DatabaseMetaData {
         return false;
     }
 
-    public void setArrays(ArrayBrowserData result) {
-        this.arrays = result;
+    public void setArraysOwned(ArrayBrowserData result) {
+        this.arraysOwned = result;
+    }
+
+    public void setArraysShared(ArrayBrowserData result) {
+        this.arraysShared = result;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

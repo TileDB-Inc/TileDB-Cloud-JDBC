@@ -10,11 +10,15 @@ import io.tiledb.cloud.rest_api.model.FileType;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TileDBCloudConnection implements java.sql.Connection {
 	private ArrayApi arrayApi;
 	private TileDBClient tileDBClient;
 	private String namespace;
+
+	Logger logger = Logger.getLogger(TileDBCloudConnection.class.getName());
 
 	/**
 	 *
@@ -89,21 +93,26 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
-		TileDBCloudConnectionMetadata tileDBCloudConnectionMetadata = new TileDBCloudConnectionMetadata();
-		// List arrays owned
+		//load data here instead of inside the metadata class to avoid multiple loads
+		TileDBCloudDatabaseMetadata tileDBCloudDatabaseMetadata = new TileDBCloudDatabaseMetadata();
+		tileDBCloudDatabaseMetadata.setNamespace(this.namespace);
+		List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
+
 		try {
-			List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
-			ArrayBrowserData result = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
-			tileDBCloudConnectionMetadata.setArrays(result);
-			return tileDBCloudConnectionMetadata;
-		} catch (ApiException e) {
-			System.err.println("Exception when calling ArrayApi#getArraysInNamespace");
-			System.err.println("Status code: " + e.getCode());
-			System.err.println("Reason: " + e.getResponseBody());
-			System.err.println("Response headers: " + e.getResponseHeaders());
-			e.printStackTrace();
+			ArrayBrowserData resultOwned = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
+			tileDBCloudDatabaseMetadata.setArraysOwned(resultOwned);
+		}catch (Exception e){
+			logger.log(Level.INFO, "User has 0 owned arrays");
 		}
-		return null;
+
+		try {
+			ArrayBrowserData resultShared = arrayApi.arraysBrowserSharedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null, null);
+			tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
+		}catch (Exception e){
+			logger.log(Level.INFO, "User has 0 shared arrays");
+		}
+
+		return tileDBCloudDatabaseMetadata;
 	}
 
 	@Override
