@@ -3,10 +3,8 @@ package io.tiledb;
 import io.tiledb.cloud.TileDBLogin;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class TileDBCloudDriver implements Driver {
 	private static final Driver INSTANCE = new TileDBCloudDriver();
@@ -74,7 +72,7 @@ public class TileDBCloudDriver implements Driver {
 
 	@Override
 	public boolean jdbcCompliant() {
-		return true;
+		return false;
 	}
 
 	@Override
