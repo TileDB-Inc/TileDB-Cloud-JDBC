@@ -10,14 +10,17 @@ import java.net.URL;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TileDBCloudResultSet implements ResultSet {
 
+	private Logger logger = Logger.getLogger(TileDBCloudResultSet.class.getName());
 	private int readBatchCount;
 	private ArrayList<ValueVector> valueVectors;
 	private int currentRow;
 	private int currentBatch;
-	private int fieldsPerBatch;
+	private int fieldsPerBatch = 0;
 	private int globalRowCount;
 	private String namespace;
 	private Map<String, Integer> columnToPosition;
@@ -29,7 +32,7 @@ public class TileDBCloudResultSet implements ResultSet {
 		this.currentBatch = 0;
 		this.globalRowCount = 1;
 		this.namespace = namespace;
-		this.fieldsPerBatch = this.valueVectors.size() / readBatchCount;
+		if (readBatchCount != 0) this.fieldsPerBatch = this.valueVectors.size() / readBatchCount;
 		this.columnToPosition = new HashMap<>();
 
 		buildColumnsToPosition();
@@ -727,6 +730,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public URL getURL(String s) throws SQLException {
+
 		return null;
 	}
 
@@ -772,11 +776,13 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public RowId getRowId(int i) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public RowId getRowId(String s) throws SQLException {
+
 		return null;
 	}
 
@@ -792,7 +798,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public int getHoldability() throws SQLException {
-		return 0;
+		return ResultSet.CLOSE_CURSORS_AT_COMMIT;
 	}
 
 	@Override
@@ -852,6 +858,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
 	@Override
 	public String getNString(int i) throws SQLException {
+
 		return null;
 	}
 

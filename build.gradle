@@ -20,6 +20,9 @@ plugins {
     id 'signing'
 }
 
+apply plugin: 'project-report'
+
+
 group 'io.tiledb'
 version '0.0.1-SNAPSHOT'
 
@@ -34,7 +37,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.0.7'
+    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.0.8'
 }
 
 test {
@@ -44,8 +47,8 @@ test {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 publishing {
     publications {
