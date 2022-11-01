@@ -2,7 +2,6 @@ package io.tiledb;
 
 import io.tiledb.cloud.TileDBClient;
 import io.tiledb.cloud.TileDBLogin;
-import io.tiledb.cloud.rest_api.ApiException;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.FileType;
@@ -43,26 +42,31 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public Statement createStatement() throws SQLException {
+		logger.log(Level.INFO, "TileDB log: Creating statement");
 		return new TileDBCloudStatement(tileDBClient, namespace);
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String s) throws SQLException {
-		return null;
+		logger.log(Level.INFO, "TileDB log: Preparing statement");
+		return new TileDBCloudPrepareStatement(tileDBClient,  namespace, s);
 	}
 
 	@Override
 	public CallableStatement prepareCall(String s) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public String nativeSQL(String s) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public void setAutoCommit(boolean b) throws SQLException {
+
 
 	}
 
@@ -96,20 +100,19 @@ public class TileDBCloudConnection implements java.sql.Connection {
 		//load data here instead of inside the metadata class to avoid multiple loads
 		TileDBCloudDatabaseMetadata tileDBCloudDatabaseMetadata = new TileDBCloudDatabaseMetadata();
 		tileDBCloudDatabaseMetadata.setNamespace(this.namespace);
+		tileDBCloudDatabaseMetadata.setArrayApi(arrayApi);
 		List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
 
 		try {
 			ArrayBrowserData resultOwned = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
 			tileDBCloudDatabaseMetadata.setArraysOwned(resultOwned);
 		}catch (Exception e){
-			logger.log(Level.INFO, "User has 0 owned arrays");
 		}
 
 		try {
 			ArrayBrowserData resultShared = arrayApi.arraysBrowserSharedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null, null);
 			tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
 		}catch (Exception e){
-			logger.log(Level.INFO, "User has 0 shared arrays");
 		}
 
 		return tileDBCloudDatabaseMetadata;
@@ -127,12 +130,11 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public void setCatalog(String s) throws SQLException {
-
 	}
 
 	@Override
 	public String getCatalog() throws SQLException {
-		return null;
+		return "TileDB-Catalog";
 	}
 
 	@Override
@@ -142,11 +144,13 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public int getTransactionIsolation() throws SQLException {
+
 		return 0;
 	}
 
 	@Override
 	public SQLWarning getWarnings() throws SQLException {
+
 		return null;
 	}
 
@@ -157,21 +161,25 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public Statement createStatement(int i, int i1) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String s, int i, int i1) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public CallableStatement prepareCall(String s, int i, int i1) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public Map<String, Class<?>> getTypeMap() throws SQLException {
+
 		return null;
 	}
 
@@ -187,11 +195,13 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public int getHoldability() throws SQLException {
+
 		return 0;
 	}
 
 	@Override
 	public Savepoint setSavepoint() throws SQLException {
+
 		return null;
 	}
 
@@ -212,51 +222,61 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public Statement createStatement(int i, int i1, int i2) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String s, int i, int i1, int i2) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public CallableStatement prepareCall(String s, int i, int i1, int i2) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String s, int i) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String s, int[] ints) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String s, String[] strings) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public Clob createClob() throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public Blob createBlob() throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public NClob createNClob() throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public SQLXML createSQLXML() throws SQLException {
+
 		return null;
 	}
 
@@ -268,6 +288,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
 	@Override
 	public void setClientInfo(String s, String s1) throws SQLClientInfoException {
 
+
 	}
 
 	@Override
@@ -277,21 +298,25 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public String getClientInfo(String s) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public Properties getClientInfo() throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public Array createArrayOf(String s, Object[] objects) throws SQLException {
+
 		return null;
 	}
 
 	@Override
 	public Struct createStruct(String s, Object[] objects) throws SQLException {
+
 		return null;
 	}
 
@@ -302,6 +327,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
 	@Override
 	public String getSchema() throws SQLException {
+
 		return null;
 	}
 
