@@ -17,7 +17,12 @@ plugins {
     id 'java-library'
     id "com.github.johnrengelman.shadow" version "7.1.2"
     id 'io.codearte.nexus-staging' version '0.30.0'
+    id 'com.github.sherter.google-java-format' version '0.9'
     id 'signing'
+}
+
+googleJavaFormat {
+    toolVersion = '1.7' // Java 8 compatible version
 }
 
 apply plugin: 'project-report'
@@ -62,6 +67,21 @@ publishing {
 task execute(type:JavaExec) {
     main = System.getProperty('mainClass')
     classpath = sourceSets.main.runtimeClasspath
+}
+
+
+import com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormat
+import com.github.sherter.googlejavaformatgradleplugin.VerifyGoogleJavaFormat
+
+task format(type: GoogleJavaFormat) {
+    source = sourceSets*.allJava
+    include '**/*.java'
+}
+
+task checkFormat(type: VerifyGoogleJavaFormat) {
+    source = sourceSets*.allJava
+    include '**/*.java'
+    ignoreFailures false
 }
 
 tasks.shadowJar.configure {
