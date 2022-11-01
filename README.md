@@ -1,4 +1,4 @@
-# TileDB JDBC Driver
+# TileDB Cloud JDBC Driver
 
 This is a JDBC driver that allows a Java program to connect to TileDB.
 
@@ -33,3 +33,11 @@ Other available properties are: ```username(String)```, ```password(String)```, 
 Statement stmt = conn.createStatement();
 ResultSet rs = stmt.executeQuery("SELECT * FROM `tiledb://TileDB-Inc/quickstart_sparse`");
 ```
+
+## Limitations
+Currently query results are limited to 2GB in size.
+
+## Application compatibility
+This driver is tested against the following applications/tools
+- [DBeaver](https://dbeaver.com)
+- [Tableau](https://www.tableau.com) (Work in progress)
