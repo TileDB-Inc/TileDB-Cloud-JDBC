@@ -13,18 +13,17 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
+public class TileDBCloudTablesResultSet implements ResultSet {
     private Iterator<ArrayInfo> iterator = null;
     private List<ArrayInfo> arraysOwned;
     private List<ArrayInfo> arraysShared;
     private List<ArrayInfo> arrays;
     private int arrayIndex;
-
     private ArrayInfo currentArray;
 
-    private Logger logger = Logger.getLogger(TileDBCloudDatabaseMetadataResultSet.class.getName());
+    private Logger logger = Logger.getLogger(TileDBCloudTablesResultSet.class.getName());
 
-    public TileDBCloudDatabaseMetadataResultSet(ArrayBrowserData arraysOwnedData, ArrayBrowserData arraysSharedData) {
+    public TileDBCloudTablesResultSet(ArrayBrowserData arraysOwnedData, ArrayBrowserData arraysSharedData) {
         this.arrays = new ArrayList<ArrayInfo>();
 
         if (arraysOwnedData == null) this.arraysOwned = new ArrayList<ArrayInfo>();
@@ -45,8 +44,7 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
         this.arrayIndex = -1;
     }
 
-    public TileDBCloudDatabaseMetadataResultSet(){
-
+    public TileDBCloudTablesResultSet() {
     }
 
     @Override
@@ -58,7 +56,6 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
         if (iterator.hasNext()) {
             currentArray = iterator.next();
-            System.out.println(currentArray);
         }
 
         return retVal;
@@ -76,51 +73,60 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return "";
+        return currentArray.getName();
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
+
         return false;
     }
 
     @Override
     public byte getByte(int columnIndex) throws SQLException {
+
         return 0;
     }
 
     @Override
     public short getShort(int columnIndex) throws SQLException {
+
         return 0;
     }
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
+
         return 0;
     }
 
     @Override
     public long getLong(int columnIndex) throws SQLException {
+
         return 0;
     }
 
     @Override
     public float getFloat(int columnIndex) throws SQLException {
+
         return 0;
     }
 
     @Override
     public double getDouble(int columnIndex) throws SQLException {
+
         return 0;
     }
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
+
         return null;
     }
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
+
         return new byte[0];
     }
 
@@ -141,16 +147,19 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
     @Override
     public InputStream getAsciiStream(int columnIndex) throws SQLException {
+
         return null;
     }
 
     @Override
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
+
         return null;
     }
 
     @Override
     public InputStream getBinaryStream(int columnIndex) throws SQLException {
+
         return null;
     }
 
@@ -166,12 +175,17 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
                 return ownership;
             case "TABLE_TYPE":
                 return "TABLE";
+            case "TABLE_SCHEM":
+                return "TileDB Schema";
+            case "TABLE_CATALOG":
+                return "DSTARA";
         }
         return "";
     }
 
     @Override
     public boolean getBoolean(String columnLabel) throws SQLException {
+
         return false;
     }
 
@@ -232,6 +246,7 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
     @Override
     public InputStream getAsciiStream(String columnLabel) throws SQLException {
+
         return null;
     }
 
@@ -262,12 +277,12 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new TileDBCloudResultSetMetadata();
+        return new TileDBCloudTablesResultSetMetadata(this.arrays);
     }
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return  currentArray.getName();
+        return null;
     }
 
     @Override
@@ -277,6 +292,7 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
     @Override
     public int findColumn(String columnLabel) throws SQLException {
+
         return 0;
     }
 
@@ -342,7 +358,7 @@ public class TileDBCloudDatabaseMetadataResultSet implements ResultSet {
 
     @Override
     public int getRow() throws SQLException {
-        return 0;
+        return arrayIndex + 1;
     }
 
     @Override
