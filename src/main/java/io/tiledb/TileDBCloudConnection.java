@@ -5,7 +5,6 @@ import io.tiledb.cloud.TileDBLogin;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.FileType;
-
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -13,346 +12,328 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TileDBCloudConnection implements java.sql.Connection {
-	private ArrayApi arrayApi;
-	private TileDBClient tileDBClient;
-	private String namespace;
-
-	Logger logger = Logger.getLogger(TileDBCloudConnection.class.getName());
-
-	/**
-	 *
-	 * @param namespace
-	 */
-	TileDBCloudConnection(String namespace) {
-		this.tileDBClient = new TileDBClient();
-		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
-		this.namespace = namespace;
-	}
-
-	/**
-	 *
-	 * @param namespace
-	 * @param login
-	 */
-	TileDBCloudConnection(String namespace, TileDBLogin login) {
-		this.tileDBClient = new TileDBClient(login);
-		this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
-		this.namespace = namespace;
-	}
-
-	@Override
-	public Statement createStatement() throws SQLException {
-		logger.log(Level.INFO, "TileDB log: Creating statement");
-		return new TileDBCloudStatement(tileDBClient, namespace);
-	}
+  private ArrayApi arrayApi;
+  private TileDBClient tileDBClient;
+  private String namespace;
+
+  Logger logger = Logger.getLogger(TileDBCloudConnection.class.getName());
+
+  /** @param namespace */
+  TileDBCloudConnection(String namespace) {
+    this.tileDBClient = new TileDBClient();
+    this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
+    this.namespace = namespace;
+  }
+
+  /**
+   * @param namespace
+   * @param login
+   */
+  TileDBCloudConnection(String namespace, TileDBLogin login) {
+    this.tileDBClient = new TileDBClient(login);
+    this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
+    this.namespace = namespace;
+  }
+
+  @Override
+  public Statement createStatement() throws SQLException {
+    logger.log(Level.INFO, "TileDB log: Creating statement");
+    return new TileDBCloudStatement(tileDBClient, namespace);
+  }
+
+  @Override
+  public PreparedStatement prepareStatement(String s) throws SQLException {
+    logger.log(Level.INFO, "TileDB log: Preparing statement");
+    return new TileDBCloudPrepareStatement(tileDBClient, namespace, s);
+  }
+
+  @Override
+  public CallableStatement prepareCall(String s) throws SQLException {
+
+    return null;
+  }
+
+  @Override
+  public String nativeSQL(String s) throws SQLException {
+
+    return null;
+  }
+
+  @Override
+  public void setAutoCommit(boolean b) throws SQLException {}
+
+  @Override
+  public boolean getAutoCommit() throws SQLException {
+    return false;
+  }
+
+  @Override
+  public void commit() throws SQLException {}
+
+  @Override
+  public void rollback() throws SQLException {}
+
+  @Override
+  public void close() throws SQLException {}
+
+  @Override
+  public boolean isClosed() throws SQLException {
+    return false;
+  }
+
+  @Override
+  public DatabaseMetaData getMetaData() throws SQLException {
+    // load data here instead of inside the metadata class to avoid multiple loads
+    TileDBCloudDatabaseMetadata tileDBCloudDatabaseMetadata = new TileDBCloudDatabaseMetadata();
+    tileDBCloudDatabaseMetadata.setNamespace(this.namespace);
+    tileDBCloudDatabaseMetadata.setArrayApi(arrayApi);
+    List<String> excludeFileType =
+        Arrays.asList(
+            FileType.NOTEBOOK.toString(),
+            FileType.FILE.toString(),
+            FileType.ML_MODEL.toString(),
+            FileType.REGISTERED_TASK_GRAPH.toString(),
+            FileType.USER_DEFINED_FUNCTION.toString());
+
+    try {
+      ArrayBrowserData resultOwned =
+          arrayApi.arraysBrowserOwnedGet(
+              null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
+      tileDBCloudDatabaseMetadata.setArraysOwned(resultOwned);
+    } catch (Exception e) {
+    }
+
+    try {
+      ArrayBrowserData resultShared =
+          arrayApi.arraysBrowserSharedGet(
+              null,
+              null,
+              null,
+              namespace,
+              null,
+              null,
+              null,
+              null,
+              null,
+              excludeFileType,
+              null,
+              null);
+      tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
+    } catch (Exception e) {
+    }
 
-	@Override
-	public PreparedStatement prepareStatement(String s) throws SQLException {
-		logger.log(Level.INFO, "TileDB log: Preparing statement");
-		return new TileDBCloudPrepareStatement(tileDBClient,  namespace, s);
-	}
+    return tileDBCloudDatabaseMetadata;
+  }
 
-	@Override
-	public CallableStatement prepareCall(String s) throws SQLException {
+  @Override
+  public void setReadOnly(boolean b) throws SQLException {}
 
-		return null;
-	}
+  @Override
+  public boolean isReadOnly() throws SQLException {
+    return false;
+  }
 
-	@Override
-	public String nativeSQL(String s) throws SQLException {
+  @Override
+  public void setCatalog(String s) throws SQLException {}
 
-		return null;
-	}
+  @Override
+  public String getCatalog() throws SQLException {
+    return "TileDB-Catalog";
+  }
 
-	@Override
-	public void setAutoCommit(boolean b) throws SQLException {
+  @Override
+  public void setTransactionIsolation(int i) throws SQLException {}
 
+  @Override
+  public int getTransactionIsolation() throws SQLException {
 
-	}
+    return 0;
+  }
 
-	@Override
-	public boolean getAutoCommit() throws SQLException {
-		return false;
-	}
+  @Override
+  public SQLWarning getWarnings() throws SQLException {
 
-	@Override
-	public void commit() throws SQLException {
+    return null;
+  }
 
-	}
+  @Override
+  public void clearWarnings() throws SQLException {}
 
-	@Override
-	public void rollback() throws SQLException {
+  @Override
+  public Statement createStatement(int i, int i1) throws SQLException {
 
-	}
+    return null;
+  }
 
-	@Override
-	public void close() throws SQLException {
+  @Override
+  public PreparedStatement prepareStatement(String s, int i, int i1) throws SQLException {
 
-	}
+    return null;
+  }
 
-	@Override
-	public boolean isClosed() throws SQLException {
-		return false;
-	}
+  @Override
+  public CallableStatement prepareCall(String s, int i, int i1) throws SQLException {
 
-	@Override
-	public DatabaseMetaData getMetaData() throws SQLException {
-		//load data here instead of inside the metadata class to avoid multiple loads
-		TileDBCloudDatabaseMetadata tileDBCloudDatabaseMetadata = new TileDBCloudDatabaseMetadata();
-		tileDBCloudDatabaseMetadata.setNamespace(this.namespace);
-		tileDBCloudDatabaseMetadata.setArrayApi(arrayApi);
-		List<String> excludeFileType = Arrays.asList(FileType.NOTEBOOK.toString(), FileType.FILE.toString(), FileType.ML_MODEL.toString(), FileType.REGISTERED_TASK_GRAPH.toString(), FileType.USER_DEFINED_FUNCTION.toString());
+    return null;
+  }
 
-		try {
-			ArrayBrowserData resultOwned = arrayApi.arraysBrowserOwnedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
-			tileDBCloudDatabaseMetadata.setArraysOwned(resultOwned);
-		}catch (Exception e){
-		}
+  @Override
+  public Map<String, Class<?>> getTypeMap() throws SQLException {
 
-		try {
-			ArrayBrowserData resultShared = arrayApi.arraysBrowserSharedGet(null, null, null, namespace, null, null, null, null, null, excludeFileType, null, null);
-			tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
-		}catch (Exception e){
-		}
+    return null;
+  }
 
-		return tileDBCloudDatabaseMetadata;
-	}
+  @Override
+  public void setTypeMap(Map<String, Class<?>> map) throws SQLException {}
 
-	@Override
-	public void setReadOnly(boolean b) throws SQLException {
+  @Override
+  public void setHoldability(int i) throws SQLException {}
 
-	}
+  @Override
+  public int getHoldability() throws SQLException {
 
-	@Override
-	public boolean isReadOnly() throws SQLException {
-		return false;
-	}
+    return 0;
+  }
 
-	@Override
-	public void setCatalog(String s) throws SQLException {
-	}
+  @Override
+  public Savepoint setSavepoint() throws SQLException {
 
-	@Override
-	public String getCatalog() throws SQLException {
-		return "TileDB-Catalog";
-	}
+    return null;
+  }
 
-	@Override
-	public void setTransactionIsolation(int i) throws SQLException {
+  @Override
+  public Savepoint setSavepoint(String s) throws SQLException {
+    return null;
+  }
 
-	}
+  @Override
+  public void rollback(Savepoint savepoint) throws SQLException {}
 
-	@Override
-	public int getTransactionIsolation() throws SQLException {
+  @Override
+  public void releaseSavepoint(Savepoint savepoint) throws SQLException {}
 
-		return 0;
-	}
+  @Override
+  public Statement createStatement(int i, int i1, int i2) throws SQLException {
 
-	@Override
-	public SQLWarning getWarnings() throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public PreparedStatement prepareStatement(String s, int i, int i1, int i2) throws SQLException {
 
-	@Override
-	public void clearWarnings() throws SQLException {
+    return null;
+  }
 
-	}
+  @Override
+  public CallableStatement prepareCall(String s, int i, int i1, int i2) throws SQLException {
 
-	@Override
-	public Statement createStatement(int i, int i1) throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public PreparedStatement prepareStatement(String s, int i) throws SQLException {
 
-	@Override
-	public PreparedStatement prepareStatement(String s, int i, int i1) throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public PreparedStatement prepareStatement(String s, int[] ints) throws SQLException {
 
-	@Override
-	public CallableStatement prepareCall(String s, int i, int i1) throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public PreparedStatement prepareStatement(String s, String[] strings) throws SQLException {
 
-	@Override
-	public Map<String, Class<?>> getTypeMap() throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public Clob createClob() throws SQLException {
 
-	@Override
-	public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    return null;
+  }
 
-	}
+  @Override
+  public Blob createBlob() throws SQLException {
 
-	@Override
-	public void setHoldability(int i) throws SQLException {
+    return null;
+  }
 
-	}
+  @Override
+  public NClob createNClob() throws SQLException {
 
-	@Override
-	public int getHoldability() throws SQLException {
+    return null;
+  }
 
-		return 0;
-	}
+  @Override
+  public SQLXML createSQLXML() throws SQLException {
 
-	@Override
-	public Savepoint setSavepoint() throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public boolean isValid(int i) throws SQLException {
+    return false;
+  }
 
-	@Override
-	public Savepoint setSavepoint(String s) throws SQLException {
-		return null;
-	}
+  @Override
+  public void setClientInfo(String s, String s1) throws SQLClientInfoException {}
 
-	@Override
-	public void rollback(Savepoint savepoint) throws SQLException {
+  @Override
+  public void setClientInfo(Properties properties) throws SQLClientInfoException {}
 
-	}
+  @Override
+  public String getClientInfo(String s) throws SQLException {
 
-	@Override
-	public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+    return null;
+  }
 
-	}
+  @Override
+  public Properties getClientInfo() throws SQLException {
 
-	@Override
-	public Statement createStatement(int i, int i1, int i2) throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public Array createArrayOf(String s, Object[] objects) throws SQLException {
 
-	@Override
-	public PreparedStatement prepareStatement(String s, int i, int i1, int i2) throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public Struct createStruct(String s, Object[] objects) throws SQLException {
 
-	@Override
-	public CallableStatement prepareCall(String s, int i, int i1, int i2) throws SQLException {
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public void setSchema(String s) throws SQLException {}
 
-	@Override
-	public PreparedStatement prepareStatement(String s, int i) throws SQLException {
+  @Override
+  public String getSchema() throws SQLException {
 
-		return null;
-	}
+    return null;
+  }
 
-	@Override
-	public PreparedStatement prepareStatement(String s, int[] ints) throws SQLException {
+  @Override
+  public void abort(Executor executor) throws SQLException {}
 
-		return null;
-	}
+  @Override
+  public void setNetworkTimeout(Executor executor, int i) throws SQLException {}
 
-	@Override
-	public PreparedStatement prepareStatement(String s, String[] strings) throws SQLException {
+  @Override
+  public int getNetworkTimeout() throws SQLException {
+    return 0;
+  }
 
-		return null;
-	}
+  @Override
+  public <T> T unwrap(Class<T> aClass) throws SQLException {
+    return null;
+  }
 
-	@Override
-	public Clob createClob() throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public Blob createBlob() throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public NClob createNClob() throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public SQLXML createSQLXML() throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public boolean isValid(int i) throws SQLException {
-		return false;
-	}
-
-	@Override
-	public void setClientInfo(String s, String s1) throws SQLClientInfoException {
-
-
-	}
-
-	@Override
-	public void setClientInfo(Properties properties) throws SQLClientInfoException {
-
-	}
-
-	@Override
-	public String getClientInfo(String s) throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public Properties getClientInfo() throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public Array createArrayOf(String s, Object[] objects) throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public Struct createStruct(String s, Object[] objects) throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public void setSchema(String s) throws SQLException {
-
-	}
-
-	@Override
-	public String getSchema() throws SQLException {
-
-		return null;
-	}
-
-	@Override
-	public void abort(Executor executor) throws SQLException {
-
-	}
-
-	@Override
-	public void setNetworkTimeout(Executor executor, int i) throws SQLException {
-
-	}
-
-	@Override
-	public int getNetworkTimeout() throws SQLException {
-		return 0;
-	}
-
-	@Override
-	public <T> T unwrap(Class<T> aClass) throws SQLException {
-		return null;
-	}
-
-	@Override
-	public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-		return false;
-	}
+  @Override
+  public boolean isWrapperFor(Class<?> aClass) throws SQLException {
+    return false;
+  }
 }
