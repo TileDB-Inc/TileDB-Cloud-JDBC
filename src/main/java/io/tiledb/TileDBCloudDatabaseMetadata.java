@@ -622,25 +622,25 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
   public ResultSet getTables(
       String catalog, String schemaPattern, String tableNamePattern, String[] types)
       throws SQLException {
-    logger.log(Level.INFO, "Requesting tables from TileDB");
-    return new TileDBCloudTablesResultSet(this.arraysOwned, this.arraysShared);
+    logger.log(Level.INFO, "Requesting arrays from TileDB");
+    return new TileDBCloudTablesResultSet(this.arraysOwned, this.arraysShared, this.namespace);
   }
 
   @Override
   public ResultSet getSchemas() throws SQLException {
-    logger.log(Level.INFO, "Requesting Schemas from TileDB");
+    logger.log(Level.INFO, "Requesting schemas from TileDB");
     return new TileDBCloudSchemasResultSet();
   }
 
   @Override
   public ResultSet getCatalogs() throws SQLException {
-    logger.log(Level.INFO, "Requesting Catalogs from TileDB");
+    logger.log(Level.INFO, "Requesting catalogs from TileDB");
     return null;
   }
 
   @Override
   public ResultSet getTableTypes() throws SQLException {
-    logger.log(Level.INFO, "Requesting Table types types from TileDB");
+    logger.log(Level.INFO, "Requesting array types types from TileDB");
 
     return new TileDBCloudTablesResultSet();
   }
