@@ -18,6 +18,7 @@ public class TileDBCloudTablesResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public int getColumnCount() throws SQLException {
+    if (arrays == null) return 0;
     return arrays.size();
   }
 
@@ -58,7 +59,7 @@ public class TileDBCloudTablesResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getColumnLabel(int column) throws SQLException {
-    return null;
+    return this.getColumnName(column);
   }
 
   @Override
@@ -83,12 +84,12 @@ public class TileDBCloudTablesResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getTableName(int column) throws SQLException {
-    return arrays.get(column - 1).getName();
+    return "TileDB-Arrays";
   }
 
   @Override
   public String getCatalogName(int column) throws SQLException {
-    return null;
+    return "TiledDB-Catalog";
   }
 
   @Override
@@ -103,7 +104,7 @@ public class TileDBCloudTablesResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public boolean isReadOnly(int column) throws SQLException {
-    return false;
+    return true;
   }
 
   @Override

@@ -40,7 +40,9 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
     this.nullable = columnNoNulls;
 
     try {
-      ArraySchema result = arrayApi.getArray(namespace, arrayName, "application/json");
+      String[] split = arrayName.split("/");
+      String arrayNameClean = split[split.length - 1];
+      ArraySchema result = arrayApi.getArray(namespace, arrayNameClean, "application/json");
       attributes = result.getAttributes();
       dimensions = result.getDomain().getDimensions();
     } catch (ApiException e) {

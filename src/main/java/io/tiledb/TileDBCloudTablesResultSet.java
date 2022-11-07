@@ -18,12 +18,14 @@ public class TileDBCloudTablesResultSet implements ResultSet {
   private List<ArrayInfo> arrays;
   private int arrayIndex;
   private ArrayInfo currentArray;
+  private String namespace;
 
   private Logger logger = Logger.getLogger(TileDBCloudTablesResultSet.class.getName());
 
   public TileDBCloudTablesResultSet(
-      ArrayBrowserData arraysOwnedData, ArrayBrowserData arraysSharedData) {
+      ArrayBrowserData arraysOwnedData, ArrayBrowserData arraysSharedData, String namespace) {
     this.arrays = new ArrayList<ArrayInfo>();
+    this.namespace = namespace;
 
     if (arraysOwnedData == null) this.arraysOwned = new ArrayList<ArrayInfo>();
     else {
@@ -69,7 +71,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return currentArray.getName();
+    return "tiledb://" + namespace + "/" + currentArray.getName();
   }
 
   @Override
@@ -166,7 +168,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
     switch (columnLabel) {
       case "TABLE_NAME":
-        return this.currentArray.getName();
+        return "tiledb://" + this.namespace + "/" + this.currentArray.getName();
       case "REMARKS":
         return ownership;
       case "TABLE_TYPE":
