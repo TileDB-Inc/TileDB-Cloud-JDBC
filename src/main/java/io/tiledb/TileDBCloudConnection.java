@@ -37,25 +37,44 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
   @Override
   public Statement createStatement() throws SQLException {
-    logger.log(Level.INFO, "TileDB log: Creating statement");
     return new TileDBCloudStatement(tileDBClient, namespace);
   }
 
   @Override
   public PreparedStatement prepareStatement(String s) throws SQLException {
-    logger.log(Level.INFO, "TileDB log: Preparing statement");
-    return new TileDBCloudPrepareStatement(tileDBClient, namespace, s);
+    String sql = removeTableauCustomLanguage(s);
+    Statement statement = this.createStatement();
+    ResultSet resultSet = statement.executeQuery(sql);
+
+    return new TileDBCloudPrepareStatement(resultSet);
+  }
+
+  /**
+   * Tableau adds some custom sql in the queries. This methods removes it.
+   *
+   * @param s The tableau query
+   * @return The TileDB compatible query.
+   */
+  private String removeTableauCustomLanguage(String s) {
+    if (!s.contains("Custom SQL Query")) return s;
+
+    int first = s.indexOf("(");
+    s = s.substring(first + 1);
+
+    int last = s.indexOf("Custom");
+    s = s.substring(0, last - 3);
+
+    logger.log(Level.INFO, "Query is: " + s);
+    return s;
   }
 
   @Override
   public CallableStatement prepareCall(String s) throws SQLException {
-
     return null;
   }
 
   @Override
   public String nativeSQL(String s) throws SQLException {
-
     return null;
   }
 

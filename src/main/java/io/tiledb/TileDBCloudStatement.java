@@ -188,12 +188,12 @@ public class TileDBCloudStatement implements Statement {
 
   @Override
   public boolean execute(String s, int[] ints) throws SQLException {
-    return false;
+    return true;
   }
 
   @Override
   public boolean execute(String s, String[] strings) throws SQLException {
-    return false;
+    return true;
   }
 
   @Override

@@ -97,7 +97,9 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public long getLong(int i) throws SQLException {
-    return (long) valueVectors.get(i - 1 + (currentBatch * fieldsPerBatch)).getObject(currentRow);
+    return ((Number)
+            valueVectors.get(i - 1 + (currentBatch * fieldsPerBatch)).getObject(currentRow))
+        .longValue();
   }
 
   @Override

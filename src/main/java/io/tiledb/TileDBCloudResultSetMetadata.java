@@ -52,7 +52,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public int getColumnDisplaySize(int column) throws SQLException {
-    return 0;
+    return 20;
   }
 
   @Override
@@ -121,7 +121,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public boolean isReadOnly(int column) throws SQLException {
-    return false;
+    return true;
   }
 
   @Override
