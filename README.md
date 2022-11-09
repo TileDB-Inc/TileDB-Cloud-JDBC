@@ -1,6 +1,6 @@
-# TileDB Cloud JDBC Driver
+# TileDB-Cloud JDBC Driver
 
-This is a JDBC driver that allows a Java program to connect to TileDB.
+This is a type 4 JDBC driver that allows a Java program to connect to TileDB-Cloud.
 
 ## Usage
 
@@ -40,4 +40,4 @@ Currently query results are limited to 2GB in size.
 ## Application compatibility
 This driver is tested against the following applications/tools
 - [DBeaver](https://dbeaver.com)
-- [Tableau](https://www.tableau.com) (Work in progress)
+- [Tableau](https://www.tableau.com) Use with our custom [TileDB-Tableau-Connector](https://github.com/TileDB-Inc/TileDB-Tableau-Connector)
