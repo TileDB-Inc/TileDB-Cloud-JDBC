@@ -116,7 +116,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getColumnTypeName(int column) throws SQLException {
-    return "TileDB-Type"; // todo
+    return "TileDB-Type";
   }
 
   @Override

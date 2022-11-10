@@ -18,7 +18,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
   Logger logger = Logger.getLogger(TileDBCloudConnection.class.getName());
 
-  /** @param namespace */
+  /** @param namespace The TileDB namespace */
   TileDBCloudConnection(String namespace) {
     this.tileDBClient = new TileDBClient();
     this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
@@ -26,8 +26,8 @@ public class TileDBCloudConnection implements java.sql.Connection {
   }
 
   /**
-   * @param namespace
-   * @param login
+   * @param namespace The TileDB namespace
+   * @param login The TileDB login object
    */
   TileDBCloudConnection(String namespace, TileDBLogin login) {
     this.tileDBClient = new TileDBClient(login);
@@ -50,13 +50,14 @@ public class TileDBCloudConnection implements java.sql.Connection {
   }
 
   /**
-   * Tableau adds some custom sql in the queries. This methods removes it.
+   * Tableau adds some custom sql in the queries. This method removes it.
    *
    * @param s The tableau query
    * @return The TileDB compatible query.
    */
   private String removeTableauCustomLanguage(String s) {
-    if (!s.contains("Custom SQL Query")) return s;
+    if (!s.contains("Custom SQL Query"))
+      return s; // if it does not contain this string it is no Tableau
 
     int first = s.indexOf("(");
     s = s.substring(first + 1);
@@ -149,7 +150,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
   @Override
   public boolean isReadOnly() throws SQLException {
-    return false;
+    return true;
   }
 
   @Override

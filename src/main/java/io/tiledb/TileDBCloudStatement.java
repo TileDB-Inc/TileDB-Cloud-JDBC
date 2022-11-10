@@ -21,6 +21,12 @@ public class TileDBCloudStatement implements Statement {
 
   private ArrayList<VectorSchemaRoot> readBatches;
 
+  /**
+   * Constructor
+   *
+   * @param tileDBClient The TileDB client object
+   * @param namespace The TileDB namespace
+   */
   TileDBCloudStatement(TileDBClient tileDBClient, String namespace) {
     this.sqlApi = new SqlApi(tileDBClient.getApiClient());
     this.namespace = namespace;
@@ -33,6 +39,7 @@ public class TileDBCloudStatement implements Statement {
     // create SQL parameters
     SQLParameters sqlParameters = new SQLParameters();
     sqlParameters.setQuery(s);
+    // get results in arrow format
     sqlParameters.setResultFormat(ResultFormat.ARROW);
 
     // create TileDBSQL object

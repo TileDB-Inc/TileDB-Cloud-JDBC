@@ -10,20 +10,17 @@ import java.util.logging.Logger;
 
 public class TileDBCloudPrepareStatement implements PreparedStatement {
 
-  //  private final TileDBCloudStatement tileDBCloudStatement;
-  //  private final String query;
   private Logger logger = Logger.getLogger(TileDBCloudPrepareStatement.class.getName());
-
   private ResultSet resultSet;
 
+  /**
+   * Constructor
+   *
+   * @param resultSet The result set as created by the TileDBCloudStatement class.
+   */
   public TileDBCloudPrepareStatement(ResultSet resultSet) {
     this.resultSet = resultSet;
   }
-
-  //  public TileDBCloudPrepareStatement(TileDBCloudStatement tileDBCloudStatement, String s) {
-  //    this.tileDBCloudStatement = tileDBCloudStatement;
-  //    this.query = s;
-  //  }
 
   @Override
   public ResultSet executeQuery() throws SQLException {

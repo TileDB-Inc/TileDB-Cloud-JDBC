@@ -26,7 +26,7 @@ public class TileDBCloudResultSet implements ResultSet {
   public TileDBCloudResultSet(
       Pair<ArrayList<ValueVector>, Integer> resultsArrow, String namespace) {
     this.readBatchCount = resultsArrow.getSecond();
-    this.valueVectors = resultsArrow.getFirst();
+    this.valueVectors = resultsArrow.getFirst(); // todo handle case of empty
     this.currentRow = -1;
     this.currentBatch = 0;
     this.globalRowCount = 1;
