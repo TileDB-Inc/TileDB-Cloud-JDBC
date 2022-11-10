@@ -2,6 +2,7 @@ package io.tiledb;
 
 import io.tiledb.cloud.rest_api.api.ArrayApi;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
+import io.tiledb.util.Util;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +38,7 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public boolean isReadOnly() throws SQLException {
-    return false;
+    return true;
   }
 
   @Override
@@ -67,7 +68,11 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public String getDatabaseProductVersion() throws SQLException {
-    return "0.0.1";
+    return Util.TILEDB_CLOUD_VERSION_MAJOR
+        + "."
+        + Util.TILEDB_CLOUD_VERSION_REVISION
+        + "."
+        + Util.TILEDB_CLOUD_VERSION_MINOR;
   }
 
   @Override
@@ -77,17 +82,17 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public String getDriverVersion() throws SQLException {
-    return "0.0.1";
+    return Util.VERSION_MAJOR + "." + Util.VERSION_REVISION + "." + Util.VERSION_MINOR;
   }
 
   @Override
   public int getDriverMajorVersion() {
-    return 0;
+    return Util.VERSION_MAJOR;
   }
 
   @Override
   public int getDriverMinorVersion() {
-    return 1;
+    return Util.VERSION_MINOR;
   }
 
   @Override
@@ -327,7 +332,7 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public String getCatalogTerm() throws SQLException {
-    return "Namespace";
+    return "";
   }
 
   @Override
@@ -845,12 +850,12 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public int getDatabaseMajorVersion() throws SQLException {
-    return 0;
+    return Util.TILEDB_CLOUD_VERSION_MAJOR;
   }
 
   @Override
   public int getDatabaseMinorVersion() throws SQLException {
-    return 1;
+    return Util.TILEDB_CLOUD_VERSION_MINOR;
   }
 
   @Override
