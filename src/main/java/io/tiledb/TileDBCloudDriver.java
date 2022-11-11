@@ -10,6 +10,8 @@ public class TileDBCloudDriver implements Driver {
   private static final Driver INSTANCE = new TileDBCloudDriver();
   private static boolean registered;
 
+  private String token = "";
+
   public TileDBCloudDriver() {}
 
   @Override
@@ -21,8 +23,10 @@ public class TileDBCloudDriver implements Driver {
     // get namespace from URL
     String namespace = parts[2];
 
+    if (parts.length == 4) token = parts[3]; // the fourth part should be the token
+
     // call the appropriate connector depending on the properties given
-    if (properties.isEmpty()) return new TileDBCloudConnection(namespace);
+    if (properties.isEmpty() && token.equals("")) return new TileDBCloudConnection(namespace);
     return new TileDBCloudConnection(namespace, createLoginObject(properties));
   }
 
@@ -37,7 +41,7 @@ public class TileDBCloudDriver implements Driver {
       return new TileDBLogin(
           (String) properties.getOrDefault("username", null),
           (String) properties.getOrDefault("password", null),
-          (String) properties.getOrDefault("apiKey", null),
+          (String) properties.getOrDefault("apiKey", token), // taken from URL
           Boolean.parseBoolean((String) properties.getOrDefault("verifySSL", "true")),
           Boolean.parseBoolean((String) properties.getOrDefault("rememberMe", "false")),
           Boolean.parseBoolean((String) properties.getOrDefault("overwritePrevious", "false")));
@@ -52,6 +56,7 @@ public class TileDBCloudDriver implements Driver {
     String[] parts = s.split(":");
 
     return parts.length >= 2
+        && parts.length <= 4
         && parts[0].equalsIgnoreCase("jdbc")
         && parts[1].equalsIgnoreCase("tiledb-cloud");
   }
