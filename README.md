@@ -38,7 +38,7 @@ ResultSet rs = stmt.executeQuery("SELECT * FROM `tiledb://TileDB-Inc/quickstart_
 Query results are limited to 2GB in size.
 
 ## Application compatibility
-This driver is tested against the following applications/tools. Compatibility with others applications is not guaranteed. 
+This driver is tested against the following applications/tools. Compatibility with other applications is not guaranteed. 
 - [DBeaver](https://dbeaver.com)
 - [Tableau](https://www.tableau.com) (Use with our custom [TileDB-Tableau-Connector](https://github.com/TileDB-Inc/TileDB-Tableau-Connector))
 - [Microsoft Power BI](https://powerbi.microsoft.com/) (Use with the ODBC powerpack from [ZappySys](https://zappysys.com))

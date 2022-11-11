@@ -63,7 +63,7 @@ public class TileDBCloudDriver implements Driver {
 
   @Override
   public DriverPropertyInfo[] getPropertyInfo(String s, Properties properties) throws SQLException {
-    DriverPropertyInfo[] driverPropertyInfo = new DriverPropertyInfo[5];
+    DriverPropertyInfo[] driverPropertyInfo = new DriverPropertyInfo[6];
     driverPropertyInfo[0] =
         new DriverPropertyInfo("Username", (String) properties.getOrDefault("username", null));
     driverPropertyInfo[0].required = false;
