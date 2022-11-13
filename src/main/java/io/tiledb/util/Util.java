@@ -8,4 +8,6 @@ public class Util {
   public static int TILEDB_CLOUD_VERSION_MINOR = 9;
   public static int TILEDB_CLOUD_VERSION_REVISION = 0;
   public static int TILEDB_CLOUD_VERSION_MAJOR = 0;
+
+  public static String SCHEMA_NAME = "TileDB Schema";
 }

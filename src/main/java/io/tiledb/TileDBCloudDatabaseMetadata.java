@@ -322,7 +322,7 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public String getSchemaTerm() throws SQLException {
-    return "TileDB-Schema";
+    return Util.SCHEMA_NAME;
   }
 
   @Override

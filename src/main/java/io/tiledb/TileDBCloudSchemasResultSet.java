@@ -1,5 +1,6 @@
 package io.tiledb;
 
+import io.tiledb.util.Util;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -31,7 +32,7 @@ public class TileDBCloudSchemasResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return "TileDB-Schema";
+    return Util.SCHEMA_NAME;
   }
 
   @Override

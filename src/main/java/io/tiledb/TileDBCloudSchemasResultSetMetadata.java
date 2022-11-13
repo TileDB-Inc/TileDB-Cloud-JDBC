@@ -1,5 +1,6 @@
 package io.tiledb;
 
+import io.tiledb.util.Util;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -57,12 +58,12 @@ public class TileDBCloudSchemasResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getColumnName(int column) throws SQLException {
-    return "TileDB-Schema";
+    return Util.SCHEMA_NAME;
   }
 
   @Override
   public String getSchemaName(int column) throws SQLException {
-    return "TileDB-Schema";
+    return Util.SCHEMA_NAME;
   }
 
   @Override

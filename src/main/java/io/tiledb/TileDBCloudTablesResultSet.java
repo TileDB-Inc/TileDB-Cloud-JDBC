@@ -2,6 +2,7 @@ package io.tiledb;
 
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.ArrayInfo;
+import io.tiledb.util.Util;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -174,9 +175,9 @@ public class TileDBCloudTablesResultSet implements ResultSet {
       case "TABLE_TYPE":
         return "TABLE";
       case "TABLE_SCHEM":
-        return "TileDB Schema";
+        return Util.SCHEMA_NAME;
       case "TABLE_CATALOG":
-        return "DSTARA";
+        return this.namespace;
     }
     return "";
   }

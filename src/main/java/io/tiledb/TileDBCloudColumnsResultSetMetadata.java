@@ -2,6 +2,7 @@ package io.tiledb;
 
 import io.tiledb.cloud.rest_api.model.Attribute;
 import io.tiledb.cloud.rest_api.model.Dimension;
+import io.tiledb.util.Util;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -81,7 +82,7 @@ public class TileDBCloudColumnsResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getSchemaName(int column) throws SQLException {
-    return "TileDB-Schema";
+    return Util.SCHEMA_NAME;
   }
 
   @Override

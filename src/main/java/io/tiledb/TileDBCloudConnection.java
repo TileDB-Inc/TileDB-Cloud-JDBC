@@ -5,6 +5,7 @@ import io.tiledb.cloud.TileDBLogin;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.FileType;
+import io.tiledb.util.Util;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -42,20 +43,35 @@ public class TileDBCloudConnection implements java.sql.Connection {
 
   @Override
   public PreparedStatement prepareStatement(String s) throws SQLException {
-    String sql = removeTableauCustomLanguage(s);
+    // make sql compatible with external apps
+    s = makeTableauCompatible(s);
+    s = makePowerBICompatible(s);
+
     Statement statement = this.createStatement();
-    ResultSet resultSet = statement.executeQuery(sql);
+    ResultSet resultSet = statement.executeQuery(s);
 
     return new TileDBCloudPrepareStatement(resultSet);
   }
 
   /**
+   * Replace \"\ with \`\ and remove schema name to make the driver fully compatible with Power BI's
+   * sql syntax.*
+   *
+   * @param sql The input query
+   * @return The TIleDB compatible query
+   */
+  private String makePowerBICompatible(String sql) {
+    String regex = "`" + Util.SCHEMA_NAME + "`.";
+    return sql.replaceAll("\"", "`").replaceAll(regex, "");
+  }
+
+  /**
    * Tableau adds some custom sql in the queries. This method removes it.
    *
-   * @param s The tableau query
+   * @param s The input query
    * @return The TileDB compatible query.
    */
-  private String removeTableauCustomLanguage(String s) {
+  private String makeTableauCompatible(String s) {
     if (!s.contains("Custom SQL Query"))
       return s; // if it does not contain this string it is no Tableau
 
