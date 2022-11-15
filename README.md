@@ -1,3 +1,5 @@
+<a href="https://tiledb.com/"><img src="https://github.com/TileDB-Inc/TileDB/raw/dev/doc/source/_static/tiledb-logo_color_no_margin_@4x.png" alt="TileDB logo" width="400"></a>
+
 # TileDB-Cloud JDBC Driver
 
 This is a type 4 JDBC driver that allows a Java program to connect to TileDB-Cloud.
@@ -24,9 +26,13 @@ properties.setProperty("rememberMe", "true");
 Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:<NAMESPACE>", properties);
 ```
 
-Where ```NAMESPASE``` is your TileDB-Cloud namespace.
+Where ```NAMESPACE``` is your TileDB-Cloud namespace.
 
-Other available properties are: ```username(String)```, ```password(String)```, ```verifySSL(boolean)```, ```overwritePrevious(boolean)```
+Other available properties are: 
+- ```username(String)```
+- ```password(String)```
+- ```verifySSL(boolean)```
+- ```overwritePrevious(boolean)```
 
 ## Run a simple query
 ```
@@ -35,7 +41,7 @@ ResultSet rs = stmt.executeQuery("SELECT * FROM `tiledb://TileDB-Inc/quickstart_
 ```
 
 ## Limitations
-Query results are limited to 2GB in size.
+Query results are limited to 2GBs in size.
 
 ## Application compatibility
 This driver is tested against the following applications/tools. Compatibility with other applications is not guaranteed. 
