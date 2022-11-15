@@ -1,9 +1,13 @@
 name: TileDB-Cloud-JDBC
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'
+    branches:
+      - 'master'
+  pull_request:
 
 jobs:
   Release:
