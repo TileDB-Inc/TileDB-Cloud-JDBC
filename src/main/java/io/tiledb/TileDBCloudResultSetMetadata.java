@@ -3,6 +3,7 @@ package io.tiledb;
 import io.tiledb.util.Util;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -100,9 +101,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
       return Types.FLOAT;
     } else if (valueVector instanceof Float8Vector) {
       return Types.DOUBLE;
-    } else if (valueVector instanceof BigIntVector
-        || valueVector instanceof UInt4Vector
-        || valueVector instanceof TimeStampVector) {
+    } else if (valueVector instanceof BigIntVector || valueVector instanceof UInt4Vector) {
       return Types.BIGINT;
     } else if (valueVector instanceof UInt1Vector) {
       return Types.SMALLINT;
@@ -110,6 +109,8 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
       return Types.TINYINT;
     } else if (valueVector instanceof VarCharVector) {
       return Types.VARCHAR;
+    } else if (valueVector instanceof TimeStampVector) {
+      return Types.TIMESTAMP;
     }
     throw new RuntimeException(
         "Type for column with index: " + column + " is not yet supported by this driver.");
@@ -117,7 +118,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getColumnTypeName(int column) throws SQLException {
-    return "TileDB-Type";
+    return this.getColumnClassName(column);
   }
 
   @Override
@@ -144,9 +145,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
       return Float.class.getName();
     } else if (valueVector instanceof Float8Vector) {
       return Double.class.getName();
-    } else if (valueVector instanceof BigIntVector
-        || valueVector instanceof UInt4Vector
-        || valueVector instanceof TimeStampVector) {
+    } else if (valueVector instanceof BigIntVector || valueVector instanceof UInt4Vector) {
       return Long.class.getName();
     } else if (valueVector instanceof UInt1Vector) {
       return Short.class.getName();
@@ -154,6 +153,8 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
       return Byte.class.getName();
     } else if (valueVector instanceof VarCharVector) {
       return String.class.getName();
+    } else if (valueVector instanceof TimeStampVector) {
+      return Timestamp.class.getName();
     }
     throw new RuntimeException(
         "Type for column with index: " + column + " is not yet supported by this driver.");

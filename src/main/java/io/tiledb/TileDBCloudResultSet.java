@@ -8,7 +8,7 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 import java.util.logging.Logger;
-import org.apache.arrow.vector.ValueVector;
+import org.apache.arrow.vector.*;
 import org.apache.arrow.vector.util.Text;
 
 public class TileDBCloudResultSet implements ResultSet {
@@ -143,7 +143,20 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public Timestamp getTimestamp(int i) throws SQLException {
-    return null;
+    // assign initial value and make transformations if necessary.
+    long value = this.getLong(i);
+
+    if (valueVectors.get(i - 1) instanceof TimeStampMicroTZVector
+        || valueVectors.get(i - 1) instanceof TimeStampMicroVector) {
+      value = value / 1000;
+    } else if (valueVectors.get(i - 1) instanceof TimeStampNanoTZVector
+        || valueVectors.get(i - 1) instanceof TimeStampNanoVector) {
+      value = value / 1000000;
+    } else if (valueVectors.get(i - 1) instanceof TimeStampSecTZVector
+        || valueVectors.get(i - 1) instanceof TimeStampSecVector) {
+      value = value * 1000;
+    }
+    return new Timestamp(value);
   }
 
   @Override
@@ -223,7 +236,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public Timestamp getTimestamp(String s) throws SQLException {
-    return null;
+    return this.getTimestamp(findColumn(s));
   }
 
   @Override
@@ -620,12 +633,12 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public Timestamp getTimestamp(int i, Calendar calendar) throws SQLException {
-    return null;
+    return this.getTimestamp(i);
   }
 
   @Override
   public Timestamp getTimestamp(String s, Calendar calendar) throws SQLException {
-    return null;
+    return this.getTimestamp(s);
   }
 
   @Override
