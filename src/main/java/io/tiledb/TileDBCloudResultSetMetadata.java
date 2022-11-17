@@ -110,7 +110,7 @@ public class TileDBCloudResultSetMetadata implements ResultSetMetaData {
     } else if (valueVector instanceof VarCharVector) {
       return Types.VARCHAR;
     } else if (valueVector instanceof TimeStampVector) {
-      return Types.TIMESTAMP;
+      return Types.TIMESTAMP_WITH_TIMEZONE;
     }
     throw new RuntimeException(
         "Type for column with index: " + column + " is not yet supported by this driver.");
