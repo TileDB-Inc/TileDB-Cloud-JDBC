@@ -28,7 +28,7 @@ apply plugin: 'project-report'
 
 
 group 'io.tiledb'
-version '0.2.0-SNAPSHOT'
+version '0.3.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -41,7 +41,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.1.0'
+    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.2.0'
 }
 
 test {
