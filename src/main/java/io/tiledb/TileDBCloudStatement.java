@@ -42,7 +42,7 @@ public class TileDBCloudStatement implements Statement {
     // get results in arrow format
     sqlParameters.setResultFormat(ResultFormat.ARROW);
 
-    //set timeout to unlimited
+    // set timeout to unlimited
     tileDBClient.setReadTimeout(0);
 
     // create TileDBSQL object

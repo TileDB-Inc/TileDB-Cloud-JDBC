@@ -9,9 +9,75 @@ on:
       - 'master'
   pull_request:
 
+
 jobs:
+  Test_Windows:
+    runs-on: windows-2019
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          check-latest: true
+
+      - name: checkFormat
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: checkFormat
+
+      - name: assemble
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assemble
+
+      - name: test
+        env:
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: test
+
+  Test_Ubuntu_macOS:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-11 ]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          check-latest: true
+
+      - run: |
+          ./gradlew checkFormat
+        shell: bash
+        name: checkFormat
+
+      - run: |
+          ./gradlew assemble
+        shell: bash
+        name: assemble
+
+      - name: test
+        env:
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+        run: |
+          ./gradlew test
+        shell: bash
+
   Release:
     if: startsWith(github.ref, 'refs/tags/')
+    needs: [Test_Ubuntu_macOS, Test_Windows]
     name: Create-Release
     runs-on: ubuntu-latest
     steps:
