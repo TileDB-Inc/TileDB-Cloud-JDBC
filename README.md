@@ -1,5 +1,7 @@
 <a href="https://tiledb.com/"><img src="https://github.com/TileDB-Inc/TileDB/raw/dev/doc/source/_static/tiledb-logo_color_no_margin_@4x.png" alt="TileDB logo" width="400"></a>
 
+[![TileDB-Cloud-JDBC](https://github.com/TileDB-Inc/TileDB-Cloud-JDBC/actions/workflows/github_actions.yml/badge.svg)](https://github.com/TileDB-Inc/TileDB-Cloud-JDBC/actions/workflows/github_actions.yml)
+
 # TileDB-Cloud JDBC Driver
 
 This is a type 4 JDBC driver that allows a Java program to connect to TileDB-Cloud.
