@@ -25,19 +25,19 @@ jobs:
           check-latest: true
 
       - name: checkFormat
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: checkFormat
 
       - name: assemble
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: assemble
 
       - name: test
         env:
           API_TOKEN: ${{ secrets.API_TOKEN }}
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: test
 
