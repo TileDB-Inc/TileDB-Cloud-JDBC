@@ -72,7 +72,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return "tiledb://" + namespace + "/" + currentArray.getName();
+    return currentArray.getTiledbUri();
   }
 
   @Override
@@ -169,7 +169,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
     switch (columnLabel) {
       case "TABLE_NAME":
-        return "tiledb://" + this.namespace + "/" + this.currentArray.getName();
+        return currentArray.getTiledbUri();
       case "REMARKS":
         return ownership;
       case "TABLE_TYPE":

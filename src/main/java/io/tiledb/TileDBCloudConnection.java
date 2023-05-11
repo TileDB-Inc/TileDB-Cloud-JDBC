@@ -140,12 +140,15 @@ public class TileDBCloudConnection implements java.sql.Connection {
     }
 
     try {
+
+      List<String> sharedTo = Arrays.asList(namespace);
+
       ArrayBrowserData resultShared =
           arrayApi.arraysBrowserSharedGet(
               null,
               null,
               null,
-              namespace,
+              null,
               null,
               null,
               null,
@@ -153,7 +156,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
               null,
               excludeFileType,
               null,
-              null);
+              sharedTo);
       tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
     } catch (Exception e) {
     }
