@@ -26,8 +26,11 @@ public class TileDBCloudDriver implements Driver {
     if (parts.length == 4) token = parts[3]; // the fourth part should be the token
 
     // call the appropriate connector depending on the properties given
-    if (properties.isEmpty() && token.equals("")) return new TileDBCloudConnection(namespace);
-    return new TileDBCloudConnection(namespace, createLoginObject(properties));
+    boolean listPublicArrays =
+        Boolean.parseBoolean((String) properties.getOrDefault("listPublicArrays", "true"));
+    if (properties.isEmpty() && token.equals(""))
+      return new TileDBCloudConnection(namespace, listPublicArrays);
+    return new TileDBCloudConnection(namespace, createLoginObject(properties), listPublicArrays);
   }
 
   /**

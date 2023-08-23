@@ -6,6 +6,7 @@ import io.tiledb.cloud.rest_api.api.SqlApi;
 import io.tiledb.cloud.rest_api.model.ResultFormat;
 import io.tiledb.cloud.rest_api.model.SQLParameters;
 import io.tiledb.java.api.Pair;
+import io.tiledb.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import org.apache.arrow.vector.ValueVector;
@@ -38,7 +39,7 @@ public class TileDBCloudStatement implements Statement {
   public ResultSet executeQuery(String s) throws SQLException {
     // create SQL parameters
     SQLParameters sqlParameters = new SQLParameters();
-    sqlParameters.setQuery(s);
+    sqlParameters.setQuery(Util.replaceArrayNamesWithUUIDs(s));
     // get results in arrow format
     sqlParameters.setResultFormat(ResultFormat.ARROW);
 

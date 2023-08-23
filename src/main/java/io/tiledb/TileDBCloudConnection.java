@@ -8,7 +8,11 @@ import io.tiledb.cloud.rest_api.model.FileType;
 import io.tiledb.util.Util;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,24 +20,27 @@ public class TileDBCloudConnection implements java.sql.Connection {
   private ArrayApi arrayApi;
   private TileDBClient tileDBClient;
   private String namespace;
+  private boolean listPublicArrays;
 
   Logger logger = Logger.getLogger(TileDBCloudConnection.class.getName());
 
   /** @param namespace The TileDB namespace */
-  TileDBCloudConnection(String namespace) {
+  TileDBCloudConnection(String namespace, boolean listPublicArrays) {
     this.tileDBClient = new TileDBClient();
     this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
     this.namespace = namespace;
+    this.listPublicArrays = listPublicArrays;
   }
 
   /**
    * @param namespace The TileDB namespace
    * @param login The TileDB login object
    */
-  TileDBCloudConnection(String namespace, TileDBLogin login) {
+  TileDBCloudConnection(String namespace, TileDBLogin login, boolean listPublicArrays) {
     this.tileDBClient = new TileDBClient(login);
     this.arrayApi = new ArrayApi(tileDBClient.getApiClient());
     this.namespace = namespace;
+    this.listPublicArrays = listPublicArrays;
   }
 
   @Override
@@ -54,8 +61,7 @@ public class TileDBCloudConnection implements java.sql.Connection {
   }
 
   /**
-   * Replace \"\ with \`\ and remove schema name to make the driver fully compatible with Power BI's
-   * sql syntax.*
+   * Making the driver fully compatible with Power BI's sql syntax.*
    *
    * @param sql The input query
    * @return The TIleDB compatible query
@@ -131,34 +137,93 @@ public class TileDBCloudConnection implements java.sql.Connection {
             FileType.REGISTERED_TASK_GRAPH.toString(),
             FileType.USER_DEFINED_FUNCTION.toString());
 
-    try {
-      ArrayBrowserData resultOwned =
-          arrayApi.arraysBrowserOwnedGet(
-              null, null, null, namespace, null, null, null, null, null, excludeFileType, null);
-      tileDBCloudDatabaseMetadata.setArraysOwned(resultOwned);
-    } catch (Exception e) {
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    List<Future<?>> tasks = new ArrayList<>();
+
+    // owned arrays
+    tasks.add(
+        executorService.submit(
+            () -> {
+              try {
+                ArrayBrowserData resultOwned =
+                    arrayApi.arraysBrowserOwnedGet(
+                        null,
+                        null,
+                        null,
+                        namespace,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        excludeFileType,
+                        null);
+                tileDBCloudDatabaseMetadata.setArraysOwned(resultOwned);
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            }));
+
+    // shared arrays
+    tasks.add(
+        executorService.submit(
+            () -> {
+              try {
+                List<String> sharedTo = Arrays.asList(namespace);
+                ArrayBrowserData resultShared =
+                    arrayApi.arraysBrowserSharedGet(
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        excludeFileType,
+                        null,
+                        sharedTo);
+                tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            }));
+
+    // public arrays
+    if (listPublicArrays) {
+      tasks.add(
+          executorService.submit(
+              () -> {
+                try {
+                  ArrayBrowserData resultPublic =
+                      arrayApi.arraysBrowserPublicGet(
+                          null,
+                          null,
+                          null,
+                          null,
+                          "name",
+                          null,
+                          null,
+                          null,
+                          null,
+                          excludeFileType,
+                          null);
+                  tileDBCloudDatabaseMetadata.setArraysPublic(resultPublic);
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+              }));
     }
 
-    try {
-
-      List<String> sharedTo = Arrays.asList(namespace);
-
-      ArrayBrowserData resultShared =
-          arrayApi.arraysBrowserSharedGet(
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              excludeFileType,
-              null,
-              sharedTo);
-      tileDBCloudDatabaseMetadata.setArraysShared(resultShared);
-    } catch (Exception e) {
+    // Shutdown the executor and wait for all threads to complete
+    executorService.shutdown();
+    for (Future<?> future : tasks) {
+      try {
+        future.get();
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
+      }
     }
 
     return tileDBCloudDatabaseMetadata;

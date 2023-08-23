@@ -1,5 +1,6 @@
 package io.tiledb;
 
+import static io.tiledb.util.Util.replaceArrayNamesWithUUIDs;
 import static java.sql.DatabaseMetaData.columnNoNulls;
 import static java.sql.DatabaseMetaData.columnNullable;
 
@@ -21,11 +22,7 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
 
   private Logger logger = Logger.getLogger(TileDBCloudColumnsResultSet.class.getName());
 
-  private String arrayName;
-  private int numColumns;
-  private ArrayInfo requestedArrayInfo = null;
-
-  private String namespace;
+  private String completeURI;
 
   private static List<Attribute> attributes; // static for speed
   private static List<Dimension> dimensions; // static for speed
@@ -33,16 +30,20 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
   private int columnCounter, nullable;
   private String currentColumnName, remarks, dataType;
 
-  public TileDBCloudColumnsResultSet(String arrayName, String namespace, ArrayApi arrayApi) {
+  public TileDBCloudColumnsResultSet(String completeURI, ArrayApi arrayApi) {
     this.columnCounter = -1;
-    this.arrayName = arrayName;
-    this.namespace = namespace;
+    // the complete URI contains both the name and the UUID
+    this.completeURI = completeURI;
     this.nullable = columnNoNulls;
 
+    String URIWithUUID = replaceArrayNamesWithUUIDs(completeURI);
+    String[] split = URIWithUUID.split("/");
+    String arrayUUIDClean = split[split.length - 1];
+    String arrayNamespaceClean = split[split.length - 2];
+
     try {
-      String[] split = arrayName.split("/");
-      String arrayNameClean = split[split.length - 1];
-      ArraySchema result = arrayApi.getArray(namespace, arrayNameClean, "application/json");
+      ArraySchema result =
+          arrayApi.getArray(arrayNamespaceClean, arrayUUIDClean, "application/json");
       attributes = result.getAttributes();
       dimensions = result.getDomain().getDimensions();
     } catch (ApiException e) {
@@ -163,7 +164,7 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
   public String getString(String columnLabel) throws SQLException {
     switch (columnLabel) {
       case "TABLE_NAME":
-        return this.arrayName;
+        return this.completeURI;
       case "COLUMN_NAME":
         return this.currentColumnName;
       case "NULLABLE":
@@ -269,7 +270,7 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
 
   @Override
   public ResultSetMetaData getMetaData() throws SQLException {
-    return new TileDBCloudColumnsResultSetMetadata(attributes, dimensions, arrayName);
+    return new TileDBCloudColumnsResultSetMetadata(attributes, dimensions, completeURI);
   }
 
   @Override
