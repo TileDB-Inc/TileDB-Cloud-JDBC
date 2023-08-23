@@ -35,6 +35,7 @@ Other available properties are:
 - ```password(String)```
 - ```verifySSL(boolean)```
 - ```overwritePrevious(boolean)```
+- ```listPublicArrays(boolean)``` lists all public TileDB arrays. Default: ```true```
 
 ## Run a simple query
 ```

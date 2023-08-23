@@ -8,7 +8,7 @@ public class Examples {
     //        Properties properties  = new Properties();
     //        properties.setProperty("apiKey", "KEY");
     //        properties.setProperty("rememberMe", "true");
-    try (Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:<NAMESPACE>");
+    try (Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:TileDB-Inc");
         Statement stmt = conn.createStatement();
         ResultSet rs =
             stmt.executeQuery("SELECT * FROM `tiledb://TileDB-Inc/quickstart_sparse`"); ) {

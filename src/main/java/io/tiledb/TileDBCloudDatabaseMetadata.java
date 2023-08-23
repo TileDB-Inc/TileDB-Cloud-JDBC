@@ -11,6 +11,8 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   private ArrayBrowserData arraysOwned;
   private ArrayBrowserData arraysShared;
+  private ArrayBrowserData arraysPublic;
+
   private String namespace;
 
   private Logger logger = Logger.getLogger(TileDBCloudDatabaseMetadata.class.getName());
@@ -628,7 +630,7 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
       String catalog, String schemaPattern, String tableNamePattern, String[] types)
       throws SQLException {
     logger.log(Level.INFO, "Requesting arrays from TileDB");
-    return new TileDBCloudTablesResultSet(this.arraysOwned, this.arraysShared, this.namespace);
+    return new TileDBCloudTablesResultSet(this.arraysOwned, this.arraysShared, this.arraysPublic);
   }
 
   @Override
@@ -655,7 +657,7 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
       String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern)
       throws SQLException {
     logger.log(Level.INFO, "Requesting columns for array: " + tableNamePattern);
-    return new TileDBCloudColumnsResultSet(tableNamePattern, namespace, arrayApi);
+    return new TileDBCloudColumnsResultSet(tableNamePattern, arrayApi);
   }
 
   @Override
@@ -957,6 +959,10 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   public void setArraysShared(ArrayBrowserData result) {
     this.arraysShared = result;
+  }
+
+  public void setArraysPublic(ArrayBrowserData resultPublic) {
+    this.arraysPublic = resultPublic;
   }
 
   public void setNamespace(String namespace) {
