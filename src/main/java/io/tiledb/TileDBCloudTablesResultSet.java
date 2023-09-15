@@ -13,12 +13,12 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class TileDBCloudTablesResultSet implements ResultSet {
-  private List<ArrayInfo> arraysOwned;
-  private List<ArrayInfo> arraysShared;
-  private List<ArrayInfo> arraysPublic;
-  private List<ArrayInfo> arrays;
+  private List<ArrayInfo> arraysOwned = new ArrayList<ArrayInfo>();
+  private List<ArrayInfo> arraysShared = new ArrayList<ArrayInfo>();
+  private List<ArrayInfo> arraysPublic = new ArrayList<ArrayInfo>();
   private int arrayIndex;
   private ArrayInfo currentArray;
+  private int numberOfArrays;
 
   private Logger logger = Logger.getLogger(TileDBCloudTablesResultSet.class.getName());
 
@@ -26,27 +26,22 @@ public class TileDBCloudTablesResultSet implements ResultSet {
       ArrayBrowserData arraysOwnedData,
       ArrayBrowserData arraysSharedData,
       ArrayBrowserData arraysPublicData) {
-    this.arrays = new ArrayList<ArrayInfo>();
 
-    if (arraysOwnedData == null) this.arraysOwned = new ArrayList<ArrayInfo>();
-    else {
-      this.arraysOwned = arraysOwnedData.getArrays();
-    }
+    if (arraysOwnedData != null) this.arraysOwned = arraysOwnedData.getArrays();
 
-    if (arraysSharedData == null) this.arraysShared = new ArrayList<ArrayInfo>();
-    else {
-      this.arraysShared = arraysSharedData.getArrays();
-    }
+    if (arraysSharedData != null) this.arraysShared = arraysSharedData.getArrays();
 
-    if (arraysPublicData == null) this.arraysPublic = new ArrayList<ArrayInfo>();
-    else {
-      this.arraysPublic = arraysPublicData.getArrays();
-    }
+    if (arraysPublicData != null) this.arraysPublic = arraysPublicData.getArrays();
 
     this.arrayIndex = -1;
+
+    this.numberOfArrays =
+        this.arraysOwned.size() + this.arraysShared.size() + this.arraysPublic.size();
   }
 
-  public TileDBCloudTablesResultSet() {}
+  public TileDBCloudTablesResultSet() {
+    this.numberOfArrays = 0;
+  }
 
   @Override
   public boolean next() throws SQLException {
@@ -83,12 +78,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return "tiledb://"
-        + currentArray.getNamespace()
-        + "/"
-        + currentArray.getName()
-        + " ~ "
-        + currentArray.getTiledbUri();
+    return "tiledb://" + currentArray.getNamespace() + "/" + currentArray.getName();
   }
 
   @Override
@@ -186,14 +176,9 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
     switch (columnLabel) {
       case "TABLE_NAME":
-        return "tiledb://"
-            + currentArray.getNamespace()
-            + "/"
-            + currentArray.getName()
-            + " ~ "
-            + currentArray.getTiledbUri();
+        return "tiledb://" + currentArray.getNamespace() + "/" + currentArray.getName();
       case "REMARKS":
-        return ownership;
+        return ownership + " TileDB URI: " + currentArray.getTiledbUri();
       case "TABLE_TYPE":
         return "TABLE";
       case "TABLE_SCHEM":
@@ -296,7 +281,8 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
   @Override
   public ResultSetMetaData getMetaData() throws SQLException {
-    return new TileDBCloudTablesResultSetMetadata(this.arrays);
+    return new TileDBCloudTablesResultSetMetadata(
+        this.arraysOwned, this.arraysShared, this.arraysPublic, this.numberOfArrays);
   }
 
   @Override
@@ -409,7 +395,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
   @Override
   public int getType() throws SQLException {
-    return 0;
+    return ResultSet.TYPE_FORWARD_ONLY;
   }
 
   @Override
