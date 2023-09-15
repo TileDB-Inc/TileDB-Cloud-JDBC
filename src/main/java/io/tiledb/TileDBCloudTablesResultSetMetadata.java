@@ -11,16 +11,26 @@ import java.util.logging.Logger;
 public class TileDBCloudTablesResultSetMetadata implements ResultSetMetaData {
   private Logger logger = Logger.getLogger(TileDBCloudTablesResultSetMetadata.class.getName());
 
-  private List<ArrayInfo> arrays;
+  private List<ArrayInfo> arraysOwned;
+  private List<ArrayInfo> arraysShared;
+  private List<ArrayInfo> arraysPublic;
+  private int numberOfArrays;
 
-  public TileDBCloudTablesResultSetMetadata(List<ArrayInfo> arrays) {
-    this.arrays = arrays;
+  public TileDBCloudTablesResultSetMetadata(
+      List<ArrayInfo> arraysOwned,
+      List<ArrayInfo> arraysShared,
+      List<ArrayInfo> arraysPublic,
+      int numberOfArrays) {
+    this.arraysOwned = arraysOwned;
+    this.arraysShared = arraysShared;
+    this.arraysPublic = arraysPublic;
+    this.numberOfArrays = numberOfArrays;
   }
 
   @Override
   public int getColumnCount() throws SQLException {
-    if (arrays == null) return 0;
-    return arrays.size();
+    if (this.numberOfArrays == 0) return 0;
+    return 5; // refers to the number of column Labels from TileDBCloudTablesResultSet which are 5
   }
 
   @Override
@@ -65,7 +75,19 @@ public class TileDBCloudTablesResultSetMetadata implements ResultSetMetaData {
 
   @Override
   public String getColumnName(int column) throws SQLException {
-    return arrays.get(column - 1).getName();
+    if (column < arraysOwned.size()) {
+      return arraysOwned.get(column - 1).getName();
+    }
+
+    if (column - arraysOwned.size() < arraysShared.size()) {
+      return arraysShared.get(column - arraysOwned.size() - 1).getName();
+    }
+
+    if (column - arraysOwned.size() - arraysShared.size() < arraysPublic.size()) {
+      return arraysPublic.get(column - arraysOwned.size() - arraysShared.size() - 1).getName();
+    }
+
+    return "";
   }
 
   @Override

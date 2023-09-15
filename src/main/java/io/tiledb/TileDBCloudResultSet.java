@@ -48,6 +48,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public boolean next() throws SQLException {
+    if (valueVectors == null) return false;
     if (valueVectors.get(currentBatch).getValueCount() - 1 > currentRow) {
       currentRow++;
       globalRowCount++;
@@ -109,7 +110,12 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public double getDouble(int i) throws SQLException {
-    return (double) valueVectors.get(i - 1 + (currentBatch * fieldsPerBatch)).getObject(currentRow);
+    try {
+      return (double)
+          valueVectors.get(i - 1 + (currentBatch * fieldsPerBatch)).getObject(currentRow);
+    } catch (java.lang.ClassCastException e) {
+      return getFloat(i);
+    }
   }
 
   @Override
@@ -398,7 +404,7 @@ public class TileDBCloudResultSet implements ResultSet {
 
   @Override
   public int getType() throws SQLException {
-    return 0;
+    return ResultSet.TYPE_FORWARD_ONLY;
   }
 
   @Override

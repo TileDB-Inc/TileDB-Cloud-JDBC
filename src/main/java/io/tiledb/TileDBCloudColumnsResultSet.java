@@ -1,6 +1,5 @@
 package io.tiledb;
 
-import static io.tiledb.util.Util.replaceArrayNamesWithUUIDs;
 import static java.sql.DatabaseMetaData.columnNoNulls;
 import static java.sql.DatabaseMetaData.columnNullable;
 
@@ -36,8 +35,7 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
     this.completeURI = completeURI;
     this.nullable = columnNoNulls;
 
-    String URIWithUUID = replaceArrayNamesWithUUIDs(completeURI);
-    String[] split = URIWithUUID.split("/");
+    String[] split = completeURI.split("/");
     String arrayUUIDClean = split[split.length - 1];
     String arrayNamespaceClean = split[split.length - 2];
 

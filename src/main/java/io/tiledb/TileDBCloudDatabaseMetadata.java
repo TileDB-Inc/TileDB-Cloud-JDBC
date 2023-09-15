@@ -70,11 +70,7 @@ public class TileDBCloudDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public String getDatabaseProductVersion() throws SQLException {
-    return Util.TILEDB_CLOUD_VERSION_MAJOR
-        + "."
-        + Util.TILEDB_CLOUD_VERSION_REVISION
-        + "."
-        + Util.TILEDB_CLOUD_VERSION_MINOR;
+    return Util.VERSION_MAJOR + "." + Util.VERSION_REVISION + "." + Util.VERSION_MINOR;
   }
 
   @Override
