@@ -6,6 +6,7 @@ import static java.sql.DatabaseMetaData.columnNullable;
 import io.tiledb.cloud.rest_api.ApiException;
 import io.tiledb.cloud.rest_api.api.ArrayApi;
 import io.tiledb.cloud.rest_api.model.*;
+import io.tiledb.util.Util;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -31,11 +32,11 @@ public class TileDBCloudColumnsResultSet implements ResultSet {
 
   public TileDBCloudColumnsResultSet(String completeURI, ArrayApi arrayApi) {
     this.columnCounter = -1;
-    // the complete URI contains both the name and the UUID
+    // the complete URI contains both the name and the short-UUID
     this.completeURI = completeURI;
     this.nullable = columnNoNulls;
-
-    String[] split = completeURI.split("/");
+    String withoutUUID = Util.removeUUID(completeURI);
+    String[] split = withoutUUID.split("/");
     String arrayUUIDClean = split[split.length - 1];
     String arrayNamespaceClean = split[split.length - 2];
 
