@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class TileDBCloudTablesResultSet implements ResultSet {
+  public static HashMap<String, String> uris = new HashMap<>();
   private List<ArrayInfo> arraysOwned = new ArrayList<ArrayInfo>();
   private List<ArrayInfo> arraysShared = new ArrayList<ArrayInfo>();
   private List<ArrayInfo> arraysPublic = new ArrayList<ArrayInfo>();
@@ -37,6 +38,31 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
     this.numberOfArrays =
         this.arraysOwned.size() + this.arraysShared.size() + this.arraysPublic.size();
+    populateURIs();
+  }
+
+  private void populateURIs() {
+
+    // Iterate through arraysOwned and add entries to the HashMap
+    for (ArrayInfo arrayInfo : arraysOwned) {
+      String key = Util.getUUIDStart(arrayInfo.getTiledbUri());
+      String value = arrayInfo.getTiledbUri();
+      uris.put(key, value);
+    }
+
+    // Iterate through arraysShared and add entries to the HashMap
+    for (ArrayInfo arrayInfo : arraysShared) {
+      String key = Util.getUUIDStart(arrayInfo.getTiledbUri());
+      String value = arrayInfo.getTiledbUri();
+      uris.put(key, value);
+    }
+
+    // Iterate through arraysPublic and add entries to the HashMap
+    for (ArrayInfo arrayInfo : arraysPublic) {
+      String key = Util.getUUIDStart(arrayInfo.getTiledbUri());
+      String value = arrayInfo.getTiledbUri();
+      uris.put(key, value);
+    }
   }
 
   public TileDBCloudTablesResultSet() {
@@ -78,7 +104,13 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return "tiledb://" + currentArray.getNamespace() + "/" + currentArray.getName();
+    return "[tiledb://"
+        + currentArray.getNamespace()
+        + "/"
+        + currentArray.getName()
+        + "]["
+        + Util.getUUIDStart(currentArray.getTiledbUri())
+        + "]";
   }
 
   @Override
@@ -176,7 +208,13 @@ public class TileDBCloudTablesResultSet implements ResultSet {
 
     switch (columnLabel) {
       case "TABLE_NAME":
-        return "tiledb://" + currentArray.getNamespace() + "/" + currentArray.getName();
+        return "[tiledb://"
+            + currentArray.getNamespace()
+            + "/"
+            + currentArray.getName()
+            + "]["
+            + Util.getUUIDStart(currentArray.getTiledbUri())
+            + "]";
       case "REMARKS":
         return ownership + " TileDB URI: " + currentArray.getTiledbUri();
       case "TABLE_TYPE":
