@@ -1,5 +1,7 @@
 package io.tiledb;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import io.tiledb.cloud.rest_api.model.ArrayBrowserData;
 import io.tiledb.cloud.rest_api.model.ArrayInfo;
 import io.tiledb.util.Util;
@@ -13,7 +15,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class TileDBCloudTablesResultSet implements ResultSet {
-  public static HashMap<String, String> uris = new HashMap<>();
+  public static BiMap<String, String> shortUUIDToUri = HashBiMap.create();
   private List<ArrayInfo> arraysOwned = new ArrayList<ArrayInfo>();
   private List<ArrayInfo> arraysShared = new ArrayList<ArrayInfo>();
   private List<ArrayInfo> arraysPublic = new ArrayList<ArrayInfo>();
@@ -47,22 +49,39 @@ public class TileDBCloudTablesResultSet implements ResultSet {
     for (ArrayInfo arrayInfo : arraysOwned) {
       String key = Util.getUUIDStart(arrayInfo.getTiledbUri());
       String value = arrayInfo.getTiledbUri();
-      uris.put(key, value);
+      putURI(key, value);
     }
 
     // Iterate through arraysShared and add entries to the HashMap
     for (ArrayInfo arrayInfo : arraysShared) {
       String key = Util.getUUIDStart(arrayInfo.getTiledbUri());
       String value = arrayInfo.getTiledbUri();
-      uris.put(key, value);
+      putURI(key, value);
     }
 
     // Iterate through arraysPublic and add entries to the HashMap
     for (ArrayInfo arrayInfo : arraysPublic) {
       String key = Util.getUUIDStart(arrayInfo.getTiledbUri());
       String value = arrayInfo.getTiledbUri();
-      uris.put(key, value);
+      putURI(key, value);
     }
+  }
+
+  /**
+   * Puts a short UUID and value to the hashmap. If the key exists it will append "-1" or "-2", etc.
+   *
+   * @param key
+   * @param value
+   */
+  private void putURI(String key, String value) {
+    int counter = 1;
+    while (shortUUIDToUri.containsKey(key)) {
+      key = key + "-" + counter;
+      counter++;
+    }
+    // we might have an array that is both public and shared. In such cases there is
+    // no need to display the array twice
+    if (!shortUUIDToUri.inverse().containsKey(value)) shortUUIDToUri.put(key, value);
   }
 
   public TileDBCloudTablesResultSet() {
@@ -109,7 +128,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
         + "/"
         + currentArray.getName()
         + "]["
-        + Util.getUUIDStart(currentArray.getTiledbUri())
+        + shortUUIDToUri.inverse().get(currentArray.getTiledbUri())
         + "]";
   }
 
@@ -213,7 +232,7 @@ public class TileDBCloudTablesResultSet implements ResultSet {
             + "/"
             + currentArray.getName()
             + "]["
-            + Util.getUUIDStart(currentArray.getTiledbUri())
+            + shortUUIDToUri.inverse().get(currentArray.getTiledbUri())
             + "]";
       case "REMARKS":
         return ownership + " TileDB URI: " + currentArray.getTiledbUri();
