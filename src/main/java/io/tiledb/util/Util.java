@@ -44,7 +44,8 @@ public class Util {
       String key = matcher.group(3);
 
       String replacement =
-          TileDBCloudTablesResultSet.uris.getOrDefault(key, ""); // Get replacement from the map
+          TileDBCloudTablesResultSet.shortUUIDToUri.getOrDefault(
+              key, ""); // Get replacement from the map
       if (!replacement.equals(""))
         matcher.appendReplacement(
             result, replacement); // Replace the match with the corresponding value
