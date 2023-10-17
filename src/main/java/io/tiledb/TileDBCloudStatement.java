@@ -1,11 +1,11 @@
 package io.tiledb;
 
+import io.tiledb.cloud.Pair;
 import io.tiledb.cloud.TileDBClient;
 import io.tiledb.cloud.TileDBSQL;
 import io.tiledb.cloud.rest_api.api.SqlApi;
 import io.tiledb.cloud.rest_api.model.ResultFormat;
 import io.tiledb.cloud.rest_api.model.SQLParameters;
-import io.tiledb.java.api.Pair;
 import io.tiledb.util.Util;
 import java.sql.*;
 import java.util.ArrayList;

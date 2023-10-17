@@ -1,6 +1,6 @@
 package io.tiledb;
 
-import io.tiledb.java.api.Pair;
+import io.tiledb.cloud.Pair;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
