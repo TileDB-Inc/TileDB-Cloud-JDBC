@@ -51,3 +51,14 @@ This driver is tested against the following applications/tools. Compatibility wi
 - [DBeaver](https://dbeaver.com)
 - [Tableau](https://www.tableau.com) (Use with our custom [TileDB-Tableau-Connector](https://github.com/TileDB-Inc/TileDB-Tableau-Connector))
 - [Microsoft Power BI](https://powerbi.microsoft.com/) (Use with the ODBC powerpack from [ZappySys](https://zappysys.com))
+
+### Important Notice for Java 17+ Users
+
+When running this project with Java version 17 or higher, it is essential to set the `_JAVA_OPTIONS` environment variable to avoid compatibility issues. Please use the following command:
+
+```sh
+export _JAVA_OPTIONS="--add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED"
+```
+
+For more details see: https://arrow.apache.org/docs/java/install.html
+
