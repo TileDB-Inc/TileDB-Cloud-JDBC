@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-name: "io.tiledb:tiledb-cloud-java"
+    reviewers:
+      - "DimitrisStaratzis"
