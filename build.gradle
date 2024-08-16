@@ -43,7 +43,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     implementation 'com.google.guava:guava:32.1.2-jre'
-    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.3.0'
+    implementation group: 'io.tiledb', name: 'tiledb-cloud-java', version: '0.4.1'
 }
 
 apply plugin: 'java'
