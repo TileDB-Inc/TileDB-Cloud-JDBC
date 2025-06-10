@@ -43,7 +43,8 @@ public class JDBCTest {
 
   @Before
   public void setup() {
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODFkYTFhN2EtYzQyOC00ZDU5LTliYzEtOTVmZmZkZTUzMzI4IiwiU2VlZCI6ODQ4NjYzNTczNTQ2NDMwMiwiZXhwIjoxOTIxMDEwMzk5LCJpYXQiOjE3MTc0MTk4NDgsIm5iZiI6MTcxNzQxOTg0OCwic3ViIjoiZHN0YXJhIn0.tCCc4xdoaYwZlFdrv2e59ZNZskCdwyqPXFNGLGiarJ8";
+    token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODFkYTFhN2EtYzQyOC00ZDU5LTliYzEtOTVmZmZkZTUzMzI4IiwiU2VlZCI6ODQ4NjYzNTczNTQ2NDMwMiwiZXhwIjoxOTIxMDEwMzk5LCJpYXQiOjE3MTc0MTk4NDgsIm5iZiI6MTcxNzQxOTg0OCwic3ViIjoiZHN0YXJhIn0.tCCc4xdoaYwZlFdrv2e59ZNZskCdwyqPXFNGLGiarJ8";
     properties = new Properties();
     properties.setProperty("apiKey", token);
   }
