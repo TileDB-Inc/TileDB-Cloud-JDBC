@@ -43,7 +43,8 @@ public class JDBCTest {
 
   @Before
   public void setup() {
-    token = System.getenv("API_TOKEN");
+    token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODFkYTFhN2EtYzQyOC00ZDU5LTliYzEtOTVmZmZkZTUzMzI4IiwiU2VlZCI6ODQ4NjYzNTczNTQ2NDMwMiwiZXhwIjoxOTIxMDEwMzk5LCJpYXQiOjE3MTc0MTk4NDgsIm5iZiI6MTcxNzQxOTg0OCwic3ViIjoiZHN0YXJhIn0.tCCc4xdoaYwZlFdrv2e59ZNZskCdwyqPXFNGLGiarJ8";
     properties = new Properties();
     properties.setProperty("apiKey", token);
   }
@@ -53,7 +54,7 @@ public class JDBCTest {
     Class.forName("io.tiledb.TileDBCloudDriver");
 
     String result = "";
-    Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:TileDB-Inc", properties);
+    Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:dstara", properties);
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT * FROM `tiledb://TileDB-Inc/quickstart_sparse`");
 
@@ -73,7 +74,7 @@ public class JDBCTest {
   public void metadataTest() throws ClassNotFoundException, SQLException {
     Class.forName("io.tiledb.TileDBCloudDriver");
 
-    Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:TileDB-Inc", properties);
+    Connection conn = DriverManager.getConnection("jdbc:tiledb-cloud:dstara", properties);
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT * FROM `tiledb://TileDB-Inc/quickstart_sparse`");
     ResultSetMetaData metadata = rs.getMetaData();
